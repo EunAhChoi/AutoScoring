@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+# 이미지 픽셀 차이 보기
+import sys
+from scipy.misc import imread
+from scipy.linalg import norm
+from scipy import sum, average
+
+# 이미지 유사성 보기
+from skimage.measure import compare_ssim
+from skimage.transform import resize
+from scipy.ndimage import imread
+
 # Tkinter는 GUI에 대한 표준 python 인터페이스이며 window 창을 생성할 수 있음.
 from tkinter import * # Toolkit interface의 약자
 from tkinter import ttk
@@ -24,7 +35,46 @@ import codecs # 인코딩 관련 모듈
 import warnings
 warnings.filterwarnings(action='ignore')
 
-# select1,2,3 함수 세개 둘다 버튼을 눌렀을 때 발생됨. 메인함수에서 불려오고 뭐 그런거 없음.
+# 이미지 픽셀 나타내보기
+def pixel(i1, i2):
+	# read images as 2D arrays (convert to grayscale for simplicity)
+	img1 = to_grayscale(i1.astype(float))
+	img2 = to_grayscale(i2.astype(float))
+
+	# compare
+	n_m, n_0 = compare_images(img1, img2)
+	print("Manhattan norm:", n_m, "/per pixel", n_m/img1.size)
+	print("Zero norm:", n_0, "/ per pixel:", n_0*1.0/img1.size)
+
+def compare_images(img1, img2):
+    # normalize to compensate for exposure difference, this may be unnecessary
+    # consider disabling it
+    img1 = normalize(img1)
+    img2 = normalize(img2)
+    # calculate the difference and its norms
+    diff = img1 - img2  # elementwise for scipy arrays
+    m_norm = sum(abs(diff))  # Manhattan norm
+    z_norm = norm(diff.ravel(), 0)  # Zero norm
+    return (m_norm, z_norm)
+
+def to_grayscale(arr):
+    "If arr is a color image (3D array), convert it to grayscale (2D array)."
+    if len(arr.shape) == 3:
+        return average(arr, -1)  # average over the last axis (color channels)
+    else:
+        return arr
+
+def normalize(arr):
+    rng = arr.max()-arr.min()
+    amin = arr.min()
+    return (arr-amin)*255/rng
+
+def show_score(img1, img2):
+	img1 = resize(img1, (2**10, 2**10))
+	img2 = resize(img2, (2**10, 2**10))
+
+	score, diff = compare_ssim(img1, img2, full = True)
+	print(score)
 
 def select1():        # 시험지 선택 함수
 
@@ -40,6 +90,12 @@ def select2():         # 정답 and 좌표찾기
 	global answerSheet, position, answerList 
 	path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장.
 	answerSheet = cv2.imread(path,0) # 답지 경로 찾아서 이미지 파일 객체 생성
+
+	# 픽셀 차이 보기
+	pixel(testSheet, answerSheet)
+
+	# 이미치 차이 score
+	show_score(testSheet, answerSheet)
 
 	# 이미지 서로 다른 부분 찾는 코드    
 	# 정확히 두 이미지간의 다른 부분의 (x, y)-coordinate location을 찾아줌.
