@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "375130394490",
+    "firebase_url": "https://autoscoring-e0b7c.firebaseio.com",
+    "project_id": "autoscoring-e0b7c",
+    "storage_bucket": "autoscoring-e0b7c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:375130394490:android:4bef62c4921502a77410c3",
+        "android_client_info": {
+          "package_name": "com.example.autoscoring"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "375130394490-kgbfi6igdddeumn4codd37veglqhv0ka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.autoscoring",
+            "certificate_hash": "cf6773e514e2258e32b07311edc88515daf3a565"
+          }
+        },
+        {
+          "client_id": "375130394490-sgu2pqi7b2q1m756qdghpbvid9reoi2p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCKmcdl0IfRxTT5o78IsxGw4dCilGt2Bc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "375130394490-sgu2pqi7b2q1m756qdghpbvid9reoi2p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
