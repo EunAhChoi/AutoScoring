@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # Tkinter는 GUI에 대한 표준 python 인터페이스이며 window 창을 생성할 수 있음.
 from tkinter import * # Toolkit interface의 약자
+from tkinter import ttk
+from tkinter import messagebox
 # Python에서 이미지를 처리하고 핸들링하기 위한 Pillow 패키지에서 이미지를 표현하는 Image class.
 from PIL import Image # Python Image Library의 약자
 # Tkinter의 bitmapImage나 photoImage를 만들거나 수정할 수 있는 모듈
@@ -19,6 +21,8 @@ import subprocess # 파이썬 외 다른 언어로 만들어진 프로그램을 
 import pytesseract # 파이썬에서 OCR을 수행해주게 하는 모듈.. (이미지에서 텍스트 따오기)
 from operator import eq # 산술연산 모듈, 항등 연산자
 import codecs # 인코딩 관련 모듈
+import warnings
+warnings.filterwarnings(action='ignore')
 
 # select1,2,3 함수 세개 둘다 버튼을 눌렀을 때 발생됨. 메인함수에서 불려오고 뭐 그런거 없음.
 
@@ -44,18 +48,38 @@ def select2():         # 정답 and 좌표찾기
 	# https://ng1004.tistory.com/89 <-- 여기서 퍼온듯
 	# compute the Structural Similarity Index (SSIM) between the two
 	# images, ensuring that the difference image is returned
+	
 	(score, diff) = compare_ssim(testSheet,answerSheet, full=True)
+	
 	# score는 두 이미지의 Structural Similarity index를 저장. 범위는 -1~1까지. 1은 perfect match를 뜻함.
 	# diff는 실제 차이 이미지를 저장한다. floating point data 로 저장되며 0~1까지 범위를 가짐
 	# 우리는 이를 8bit unsigned integer (0~255)로 이루어진 array로 convert해야됨. (OpenCV를 이용하기 위해) 
+	
 	diff = (diff*255).astype("uint8")
+	
 	# threshold (임계값)을 찾음... 뭔가 조정하는게 있는거 같음. (매우 이해하기 어려움)
 	# threshold the difference image, followed by finding contours to
 	# obtain the regions of the two input images that differ
+	
 	thresh = cv2.threshold(diff,0,255,cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+	
 	# thresh 변수의 경계(윤곽선)를 찾음.
+	
 	cnts = cv2.findContours(thresh.copy(),cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+
+	# 이미지의 차이를 실제 png 파일로 만들어주는 코드 추가
+	diff = cv2.absdiff(testSheet, answerSheet)
+	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
+
+	th = 1
+	imask = mask>th
+
+	canvas = np.zeros_like(answerSheet, np.uint8)
+	canvas[imask] = answerSheet[imask]
+
+	cv2.imwrite("/Users/hcy/Desktop/result.png", canvas)
 
 	# 정답지 세로로 분리
 	# 이제 윤곽선을 list에 저장 했으므로, 각 이미지의 다른 영역 주위에 사각형을 그리겠습니다.
@@ -321,10 +345,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 
-
 # initialize the window toolkit along with the two image panels
-root = Tk()
-
 testSheet = None
 answerSheet = None
 studentSheet = None
@@ -332,17 +353,52 @@ position = []
 answerList = []
 
 
+# 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
+root = Tk()
+root.title("Test type")
+root.geometry('250x300+200+200')
+
+def selectTypeOfTest():
+    str = ''
+    if radVar.get() == 1:
+        str = str + '숫자 시험지가 선택되었습니다.'
+    if radVar.get() == 2:
+        str = str + '영어 시험지가 선택되었습니다.'
+    messagebox.showinfo("Button clicked", str)
+
+radVar = IntVar()
+r1 = ttk.Radiobutton(root, text="Numeric", variable = radVar, value = 1)
+r1.grid(column=0, row=0, padx = '10', pady = '10', ipadx = '10', ipady = '10')
+
+r2 = ttk.Radiobutton(root, text="English", variable = radVar, value = 2)
+r2.grid(column=0, row=1, padx = '10', pady = '10', ipadx = '10', ipady = '10')
+
+action = ttk.Button(root, text = "Select type of Test", command = selectTypeOfTest)
+action.grid(column = 0, row =2, padx = '10', pady = '10', ipadx = '10', ipady = '10')
+
+root.mainloop()
+
+#####################################################################
+# 시험지를 넣는 UI 창
+sheet = Tk()
+sheet.title("Auto Scoring")
+sheet.geometry('270x500+200+100')
+
 # create a button, then when pressed, will trigger a file chooser
 # dialog and allow the user to select an input image; then add the
 # button the GUI
-btn = Button(root, text="학생의 시험지를 넣으세여", command=select3)     # button누르면 select3 실행됨
-btn.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
+btn = Button(sheet, text="Input Test Sheet", command=select1)     # button누르면 select3 실행됨
+#btn.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
+btn.grid(column = 0, row = 0, padx = '25', pady = '25', ipadx = '25', ipady = '25')
 
-btn1 = Button(root, text="정답지를 넣으세여", command=select2)
-btn1.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
+btn1 = Button(sheet, text="Input Answer Sheet", command=select2)
+#btn1.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
+btn1.grid(column = 0, row = 1, padx = '25', pady = '25', ipadx = '25', ipady = '25')
 
-btn2 = Button(root, text="시험지를 넣으세여", command=select1)
-btn2.pack(side="bottom", fill="both", expand="yes", padx="10", pady="10")
+
+btn2 = Button(sheet, text="Input Student Test Sheet", command=select3)
+#btn2.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
+btn2.grid(column = 0, row = 2, padx = '25', pady = '25', ipadx = '25', ipady = '25')
 
 # kick off the GUI
-root.mainloop()
+sheet.mainloop()
