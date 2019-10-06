@@ -480,25 +480,35 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	cv2.destroyAllWindows()
 
 # initialize the window toolkit along with the two image panels
+# 띄어쓰기가 indent
 testSheet = None
 answerSheet = None
 studentSheet = None
 position = []
 answerList = []
 
-
 # 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
+# 숫자 시험지면 상태에 0, 영어 시험지면 상태에 1
+global state
+out = 0
 root = Tk()
 root.title("Test type")
-root.geometry('250x300+200+200')
+root.geometry('200x200+200+200')
 
 def selectTypeOfTest():
     str = ''
     if radVar.get() == 1:
         str = str + '숫자 시험지가 선택되었습니다.'
+        state = 1
     if radVar.get() == 2:
         str = str + '영어 시험지가 선택되었습니다.'
+        state = 2
+    if radVar.get() == False:
+        str = str + '아무것도 선택되지 않았습니다. 다시 선택하세여'
     messagebox.showinfo("Button clicked", str)
+    str = ''
+    if radVar.get() == 1 or radVar.get() == 2:
+        root.destroy()
 
 radVar = IntVar()
 r1 = ttk.Radiobutton(root, text="Numeric", variable = radVar, value = 1)
@@ -509,30 +519,30 @@ r2.grid(column=0, row=1, padx = '10', pady = '10', ipadx = '10', ipady = '10')
 
 action = ttk.Button(root, text = "Select type of Test", command = selectTypeOfTest)
 action.grid(column = 0, row =2, padx = '10', pady = '10', ipadx = '10', ipady = '10')
-
+    
 root.mainloop()
 
 #####################################################################
 # 시험지를 넣는 UI 창
 sheet = Tk()
 sheet.title("Auto Scoring")
-sheet.geometry('270x500+200+100')
+sheet.geometry('230x250+200+100')
 
 # create a button, then when pressed, will trigger a file chooser
 # dialog and allow the user to select an input image; then add the
 # button the GUI
 btn = Button(sheet, text="Input Test Sheet", command=select1)     # button누르면 select3 실행됨
 #btn.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
-btn.grid(column = 0, row = 0, padx = '25', pady = '25', ipadx = '25', ipady = '25')
+btn.grid(column = 0, row = 0, padx = '15', pady = '15', ipadx = '15', ipady = '15')
 
 btn1 = Button(sheet, text="Input Answer Sheet", command=select2)
 #btn1.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
-btn1.grid(column = 0, row = 1, padx = '25', pady = '25', ipadx = '25', ipady = '25')
+btn1.grid(column = 0, row = 1, padx = '15', pady = '15', ipadx = '15', ipady = '15')
 
 
 btn2 = Button(sheet, text="Input Student Test Sheet", command=select3)
 #btn2.pack(side="bottom", fill="both", expand="True", padx="50", pady="50", ipadx="50", ipady="50")
-btn2.grid(column = 0, row = 2, padx = '25', pady = '25', ipadx = '25', ipady = '25')
+btn2.grid(column = 0, row = 2, padx = '15', pady = '15', ipadx = '15', ipady = '15')
 
 # kick off the GUI
 sheet.mainloop()
