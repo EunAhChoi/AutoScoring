@@ -134,11 +134,10 @@ def select1():        # 시험지 선택 함수
 	# 0은 gray로 읽겠다는 의미 (cv2.IMREAD_GRAYSCALE)
 
 	# 사진 픽셀 가져옴
-    testSheet_shape = testSheet.shape
-    print(testSheet_shape)
+    print(testSheet.shape)
 	# 명암 조절
-    testSheet2 = testSheet +100
-    testSheet3 = testSheet -100
+    #testSheet2 = testSheet +100
+    #testSheet3 = testSheet -100
     #cv2.imshow("test", testSheet)
     #cv2.imshow("-100", testSheet2)
     #cv2.imshow("+100", testSheet3)
@@ -298,42 +297,29 @@ def select2():         # 정답 and 좌표찾기
 			img.append(answerSheet[minY:maxY, minX:maxX])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
 	#print(len(answerList))
 	answerList = []
+	# 시험지와 답안지 비교해서 답을 짤라서 각각 저장
 	for i in range(0, len(img)):
 		cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
 
-	# 이 코드가 실행하고 있는 위치에 answer이라는 폴더만들면 정답지가 answer폴더안에 저장       dir있는지 확인하고 없으면 만드는 코드로 수정
-	for i in range(len(img)):
-		#cv2.imshow(str(i), img[i])
-		# resize = cv2.resize(img[i], None, fx=2.0, fy=2.0, interpolation=cv2.INTER_CUBIC + cv2.INTER_LINEAR)
+	os.chdir("/Users/hcy/Desktop/GP/src/")
+	os.system("python3 main_answer.py")
 
-		'''gau = cv2.GaussianBlur(resize, (5, 5), 0)
-		temp = cv2.addWeighted(resize, 1.5, gau, -0.5, 0)
+	# 정답을 리스트로 저장해봄
+	trueAnswer = []
+	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/trueAnswerLists.txt','r') as r:
+		while(1):
+			line = r.readline()
+			try:escape=line.index('\n')
+			except:escape=len(line)
 
-		kernel = np.ones((2,2), np.uint8)
-		er = cv2.erode(temp, kernel, iterations=1)'''
+			if line:
+				trueAnswer.append(line[0:escape].replace(" ",""))
+			else:
+				break
+	r.close()
 
-		#cv2.imshow("zzz", er)
-		#tessdata_dir_config = r'--tessdata-dir "<C:\Program Files (x86)\Tesseract-OCR\tessdata>"'
-
-		#cv2.imwrite("answer\\"+"ss"+str(i) + ".jpg", er)
-
-		# OCR 기능을 위해 pytesseract 이용
-		result = pytesseract.image_to_string(img[i],lang='eng')
-		result = result.replace(" ","")
-		result = str(result)
-		answerList.append(result)
-		#print(result)
-
-	if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
-		os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
-
-	f = open("/Users/hcy/Desktop/GP/answerSheet/answerList.txt","w",-1,"utf-8")
-	for i in range(len(answerList)):
-		f.write(answerList[i]+"\n")
-	f.close()
-
-	#cv2.waitKey(0)  # esc키 누르면 나온 답지 꺼짐
-	#cv2.destroyAllWindows()
+	for i in range(len(trueAnswer)):
+		print(trueAnswer[i] + "\n")
 
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
 	global studentSheet
@@ -342,32 +328,13 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	studentSheet = cv2.imread(path,0)
 	if not (os.path.isdir("/Users/hcy/Desktop/GP/answer")):
 		os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answer"))
-	'''for i in range(0,len(position)):
-		studentAnswer.append(studentSheet[position[i][0]:position[i][1],position[i][2]:position[i][3]])
-		cv2.imwrite("answer\\"+str(i)+".jpg",studentAnswer[i])'''
-
-	#cv2.imshow("test",testSheet)
-	#cv2.imshow("answer",answerSheet)
-	#cv2.imshow("student",studentSheet)
-
-	# 이미지 서로 다른 부분 찾는 코드 위에 상세한 설명
-	# 이미지 서로 다른 부분 찾는 코드    
-	# 정확히 두 이미지간의 다른 부분의 (x, y)-coordinate location을 찾아줌.
-	# compare_ssim : 두 이미지 사이의 구조적 유사성 지수를 계산하여 different 이미지가 반환되도록 한다.
-	# 시험지가 저장된 객체와 답지가 저장된 객체를 파라미터로
-	# https://ng1004.tistory.com/89 <-- 여기서 퍼온듯
-	# compute the Structural Similarity Index (SSIM) between the two
-	# images, ensuring that the difference image is returned
+	
 	(score, diff) = compare_ssim(testSheet, studentSheet, full=True)
-	# score는 두 이미지의 Structural Similarity index를 저장. 범위는 -1~1까지. 1은 perfect match를 뜻함.
-	# diff는 실제 차이 이미지를 저장한다. floating point data 로 저장되며 0~1까지 범위를 가짐
-	# 우리는 이를 8bit unsigned integer (0~255)로 이루어진 array로 convert해야됨. (OpenCV를 이용하기 위해)
+	
 	diff = (diff * 255).astype("uint8")
-	# threshold (임계값)을 찾음... 뭔가 조정하는게 있는거 같음. (매우 이해하기 어려움)
-	# threshold the difference image, followed by finding contours to
-	# obtain the regions of the two input images that differ
+	
 	thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-	# thresh 변수의 경계(윤곽선)를 찾음.
+	
 	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
@@ -448,7 +415,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 				break
 	r.close()
 	answerList1 = []
-	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/answerListTest.txt','r',encoding='utf-8') as g:
+	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/answerList.txt','r',encoding='utf-8') as g:
 		while(1):
 			line = g.readline()
 			try:escape=line.index('\r\n')
