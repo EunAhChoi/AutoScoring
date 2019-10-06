@@ -142,7 +142,7 @@ def select1():        # 시험지 선택 함수
     #cv2.imshow("-100", testSheet2)
     #cv2.imshow("+100", testSheet3)
 
-
+# 인덴트 탭
 def select2():         # 정답 and 좌표찾기
 	# answerSheet : 정답지 저장하는 곳. position : ??, answerList : 정답 추출?
 	global answerSheet, position, answerList 
@@ -158,13 +158,13 @@ def select2():         # 정답 and 좌표찾기
     # 이미지 노이즈 제거. (http://www.gisdeveloper.co.kr/?p=7168)
 	#dst = cv2.fastNlMeansDenoising(answerSheet, None, 10, 7, 21)
 	# 픽셀 차이 보기
-	pixel(testSheet, answerSheet)
+	#pixel(testSheet, answerSheet)
 
 	# 이미치 차이 score
-	show_score(testSheet, answerSheet)
+	#show_score(testSheet, answerSheet)
 
 	# 색으로 구별
-	dif_color()
+	#dif_color()
 
 	
 	# 이미지 서로 다른 부분 찾는 코드    
@@ -202,8 +202,9 @@ def select2():         # 정답 and 좌표찾기
 	# 이미지의 차이를 실제 png 파일로 만들어주는 코드 추가
 	diff = cv2.absdiff(testSheet, answerSheet)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
+	#diff = cv2.GaussianBlur(diff,(3,3),0)
 
-	ret,img_binary=cv2.threshold(diff, 130,255,cv2.THRESH_BINARY)
+	ret,img_binary=cv2.threshold(diff, 120,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result6.png", img_binary)
 
 	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -307,31 +308,51 @@ def select2():         # 정답 and 좌표찾기
 	#for i in range(len(answerList)):
     #		print(answerList[i])
 
-	print("#######################################")
-	# 시험지와 답안지 비교해서 답을 짤라서 각각 저장
-	for i in range(0, len(img)):
-		cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
+	if state == 1:
+		print("아직 안만들엇땅!!")
+		answerList = []
+		for i in range(len(img)):
+			result = pytesseract.image_to_string(img[i],config='digits')
+			#result = result.replace(" ","")
+			#result = str(result)
+			answerList.append(result)
 
-	os.chdir("/Users/hcy/Desktop/GP/src/")
-	os.system("python3 main_answer.py")
+		for i in range(len(answerList)):
+			print(answerList[i])
 
-	# 정답을 리스트로 저장해봄
-	global trueAnswer
-	trueAnswer = []
-	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/trueAnswerLists.txt','r') as r:
-		while(1):
-			line = r.readline()
-			try:escape=line.index('\n')
-			except:escape=len(line)
+		if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
+			os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
+		f = open("/Users/hcy/Desktop/GP/answerSheet/answerNumberList.txt","w",-1,"utf-8")
+		for i in range(len(answerList)):
+			f.write(answerList[i]+"\n")
+		f.close()
 
-			if line:
-				trueAnswer.append(line[0:escape].replace(" ",""))
-			else:
-				break
-	r.close()
+	if state == 2:
+		print("#######################################")
+		# 시험지와 답안지 비교해서 답을 짤라서 각각 저장
+		for i in range(0, len(img)):
+			cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
 
-	for i in range(len(trueAnswer)):
-		print(trueAnswer[i])
+		os.chdir("/Users/hcy/Desktop/GP/src/")
+		os.system("python3 main_answer.py")
+
+		# 정답을 리스트로 저장해봄
+		global trueAnswer
+		trueAnswer = []
+		with codecs.open('/Users/hcy/Desktop/GP/answerSheet/trueAnswerLists.txt','r') as r:
+			while(1):
+				line = r.readline()
+				try:escape=line.index('\n')
+				except:escape=len(line)
+
+				if line:
+					trueAnswer.append(line[0:escape].replace(" ",""))
+				else:
+					break
+		r.close()
+
+		for i in range(len(trueAnswer)):
+			print(trueAnswer[i])
 
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
 	global studentSheet
@@ -489,13 +510,13 @@ answerList = []
 
 # 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
 # 숫자 시험지면 상태에 0, 영어 시험지면 상태에 1
-global state
 out = 0
 root = Tk()
 root.title("Test type")
 root.geometry('200x200+200+200')
 
 def selectTypeOfTest():
+    global state
     str = ''
     if radVar.get() == 1:
         str = str + '숫자 시험지가 선택되었습니다.'
