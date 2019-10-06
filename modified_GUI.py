@@ -175,14 +175,14 @@ def select2():         # 정답 and 좌표찾기
 	# compute the Structural Similarity Index (SSIM) between the two
 	# images, ensuring that the difference image is returned
 	
-	(score, diff) = compare_ssim(testSheet,answerSheet, full=True)
+	#(score, diff) = compare_ssim(testSheet,answerSheet, full=True)
 	#diff = cv2.absdiff(testSheet, answerSheet)
 	
 	# score는 두 이미지의 Structural Similarity index를 저장. 범위는 -1~1까지. 1은 perfect match를 뜻함.
 	# diff는 실제 차이 이미지를 저장한다. floating point data 로 저장되며 0~1까지 범위를 가짐
 	# 우리는 이를 8bit unsigned integer (0~255)로 이루어진 array로 convert해야됨. (OpenCV를 이용하기 위해) 
 	
-	diff = (diff*255).astype("uint8")
+	#diff = (diff*255).astype("uint8")
 	
 	# threshold the difference image, followed by finding contours to
 	# obtain the regions of the two input images that differ
@@ -190,9 +190,9 @@ def select2():         # 정답 and 좌표찾기
 
 	#thresh = cv2.threshold(diff, 130,255,cv2.THRESH_BINARY)
 	#thresh = cv2.threshold(diff,130,255,cv2.THRESH_BINARY)
-	thresh = cv2.adaptiveThreshold(diff, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11, 2)
+	#thresh = cv2.adaptiveThreshold(diff, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11, 2)
 
-	cv2.imwrite("/Users/hcy/Desktop/result3.png", thresh)
+	#cv2.imwrite("/Users/hcy/Desktop/result3.png", thresh)
 	# thresh 변수의 경계(윤곽선)를 찾음.
 	
 	#cnts = cv2.findContours(thresh.copy(),cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -203,10 +203,8 @@ def select2():         # 정답 and 좌표찾기
 	diff = cv2.absdiff(testSheet, answerSheet)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 
-	ret,img_binary=cv2.threshold(mask, 130,255,cv2.THRESH_BINARY)
+	ret,img_binary=cv2.threshold(diff, 130,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result6.png", img_binary)
-
-	img_temp = cv2.imread("/Users/hcy/Desktop/result6.png",cv2.IMREAD_COLOR)
 
 	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
@@ -295,8 +293,21 @@ def select2():         # 정답 and 좌표찾기
 			pass
 		else:
 			img.append(answerSheet[minY:maxY, minX:maxX])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
-	#print(len(answerList))
-	answerList = []
+
+	#answerList = []
+	#for i in range(len(img)):
+		
+		# OCR 기능을 위해 pytesseract 이용
+	#	result = pytesseract.image_to_string(img[i],lang='eng')
+	#	result = result.replace(" ","")
+	#	result = str(result)
+	#	answerList.append(result)
+		#print(result)
+
+	#for i in range(len(answerList)):
+    #		print(answerList[i])
+
+	print("#######################################")
 	# 시험지와 답안지 비교해서 답을 짤라서 각각 저장
 	for i in range(0, len(img)):
 		cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
@@ -305,6 +316,7 @@ def select2():         # 정답 and 좌표찾기
 	os.system("python3 main_answer.py")
 
 	# 정답을 리스트로 저장해봄
+	global trueAnswer
 	trueAnswer = []
 	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/trueAnswerLists.txt','r') as r:
 		while(1):
@@ -319,7 +331,7 @@ def select2():         # 정답 and 좌표찾기
 	r.close()
 
 	for i in range(len(trueAnswer)):
-		print(trueAnswer[i] + "\n")
+		print(trueAnswer[i])
 
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
 	global studentSheet
@@ -329,13 +341,22 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	if not (os.path.isdir("/Users/hcy/Desktop/GP/answer")):
 		os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answer"))
 	
-	(score, diff) = compare_ssim(testSheet, studentSheet, full=True)
+	#(score, diff) = compare_ssim(testSheet, studentSheet, full=True)
 	
-	diff = (diff * 255).astype("uint8")
+	#diff = (diff * 255).astype("uint8")
 	
-	thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+	#thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 	
-	cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+	#cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+	#cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+	diff = cv2.absdiff(testSheet, studentSheet)
+	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
+
+	ret,img_binary=cv2.threshold(diff, 110,255,cv2.THRESH_BINARY)
+	cv2.imwrite("/Users/hcy/Desktop/result7.png", img_binary)
+
+	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
 	# 정답지 세로로 분리
@@ -363,7 +384,6 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		y1 = y
 		count += 1
 
-	#zz=cv2.imread(path,1)
 	# 정답지 세로로 분리된 것 중에 가로로 분리할 수 있는지 확인
 	a, b, c, d = 0, 0, 0, 0
 	for i in range(0, len(row2)):
@@ -393,9 +413,8 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 			pos.append(minX)
 			pos.append(maxX)
 			position.append(pos)
-	#cv2.imwrite("/Users/hcy/Desktop/GP/myanswer.jpg",zz)
+
 	for i in range(0, len(img2)):
-		#print(img2[i]) #홍
 		cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
 	os.chdir("/Users/hcy/Desktop/GP/src/")
 	os.system("python3 main.py")           # main.py 실행하면 answerImage에 있는 폴더 모두 실행, txt파일에 정답 저장
@@ -414,30 +433,16 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 			else:
 				break
 	r.close()
-	answerList1 = []
-	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/answerList.txt','r',encoding='utf-8') as g:
-		while(1):
-			line = g.readline()
-			try:escape=line.index('\r\n')
-			except:
-				escape = len(line)
 
-			if line:
-				answerList1.append(line[0:escape].replace(" ", ""))
-			else:
-				break
-	g.close()
-
-	print(answerList1)
 	print(studentAnswer)
 
 	score = len(studentAnswer)
 	print("길이 ", len(studentAnswer)) # 홍
-	correctNum = np.zeros(len(answerList1))
+	correctNum = np.zeros(len(trueAnswer))
 	for i in range(0,len(studentAnswer)):
 		correct = 0
 		for j in range(0,len(answerList)):              # answerList는 순서대로 저장돼 있으므로 j에 따라 채점
-			if(studentAnswer[i] == answerList[j]):
+			if(studentAnswer[i] == trueAnswer[j]):
 				correct = 1
 				correctNum[j]=1
 				break
