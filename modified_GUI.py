@@ -204,7 +204,7 @@ def select2():         # 정답 and 좌표찾기
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 	#diff = cv2.GaussianBlur(diff,(3,3),0)
 
-	ret,img_binary=cv2.threshold(diff, 120,255,cv2.THRESH_BINARY)
+	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result6.png", img_binary)
 
 	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -293,7 +293,7 @@ def select2():         # 정답 and 좌표찾기
 		if abs(maxY - minY) < 5:
 			pass
 		else:
-			img.append(answerSheet[minY:maxY, minX:maxX])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
+			img.append(answerSheet[minY-5:maxY+5, minX-5:maxX+5])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
 
 	#answerList = []
 	#for i in range(len(img)):
@@ -312,7 +312,7 @@ def select2():         # 정답 and 좌표찾기
 		print("아직 안만들엇땅!!")
 		answerList = []
 		for i in range(len(img)):
-			result = pytesseract.image_to_string(img[i],config='digits')
+			result = pytesseract.image_to_string(img[i],config='--psm 6')
 			#result = result.replace(" ","")
 			#result = str(result)
 			answerList.append(result)
@@ -326,6 +326,10 @@ def select2():         # 정답 and 좌표찾기
 		for i in range(len(answerList)):
 			f.write(answerList[i]+"\n")
 		f.close()
+		
+		for i in range(0, len(img)):
+			cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
+
 
 	if state == 2:
 		print("#######################################")
