@@ -142,10 +142,12 @@ def select1():        # 시험지 선택 함수
     #cv2.imshow("-100", testSheet2)
     #cv2.imshow("+100", testSheet3)
 
+##############################################################################
+
 # 인덴트 탭
 def select2():         # 정답 and 좌표찾기
 	# answerSheet : 정답지 저장하는 곳. position : ??, answerList : 정답 추출?
-	global answerSheet, position, answerList 
+	global answerSheet, position, answerList
 	path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장.
 	answerSheet = cv2.imread(path,0) # 답지 경로 찾아서 이미지 파일 객체 생성
 
@@ -295,36 +297,21 @@ def select2():         # 정답 and 좌표찾기
 		else:
 			img.append(answerSheet[minY-5:maxY+5, minX-5:maxX+5])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
 
-	#answerList = []
-	#for i in range(len(img)):
-		
-		# OCR 기능을 위해 pytesseract 이용
-	#	result = pytesseract.image_to_string(img[i],lang='eng')
-	#	result = result.replace(" ","")
-	#	result = str(result)
-	#	answerList.append(result)
-		#print(result)
-
-	#for i in range(len(answerList)):
-    #		print(answerList[i])
 
 	if state == 1:
-		print("아직 안만들엇땅!!")
-		answerList = []
+
 		for i in range(len(img)):
 			result = pytesseract.image_to_string(img[i],config='--psm 6')
-			#result = result.replace(" ","")
-			#result = str(result)
-			answerList.append(result)
+			trueAnswer.append(result)
 
-		for i in range(len(answerList)):
-			print(answerList[i])
+		for i in range(len(trueAnswer)):
+			print(trueAnswer[i])
 
 		if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
 			os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
 		f = open("/Users/hcy/Desktop/GP/answerSheet/answerNumberList.txt","w",-1,"utf-8")
-		for i in range(len(answerList)):
-			f.write(answerList[i]+"\n")
+		for i in range(len(trueAnswer)):
+			f.write(trueAnswer[i]+"\n")
 		f.close()
 		
 		for i in range(0, len(img)):
@@ -341,8 +328,6 @@ def select2():         # 정답 and 좌표찾기
 		os.system("python3 main_answer.py")
 
 		# 정답을 리스트로 저장해봄
-		global trueAnswer
-		trueAnswer = []
 		with codecs.open('/Users/hcy/Desktop/GP/answerSheet/trueAnswerLists.txt','r') as r:
 			while(1):
 				line = r.readline()
@@ -358,9 +343,10 @@ def select2():         # 정답 and 좌표찾기
 		for i in range(len(trueAnswer)):
 			print(trueAnswer[i])
 
+#################################################################################
+
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
 	global studentSheet
-	studentAnswer = []
 	path = filedialog.askopenfilename()
 	studentSheet = cv2.imread(path,0)
 	if not (os.path.isdir("/Users/hcy/Desktop/GP/answer")):
@@ -378,7 +364,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	diff = cv2.absdiff(testSheet, studentSheet)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 
-	ret,img_binary=cv2.threshold(diff, 110,255,cv2.THRESH_BINARY)
+	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result7.png", img_binary)
 
 	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -430,8 +416,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		if abs(maxY - minY) < 5:
 			pass
 		else:
-			img2.append(studentSheet[minY:maxY, minX:maxX])  # img == 최종 답안 단어들의 이미지를 저장한 리스트
-			#cv2.rectangle(zz,(minX,minY),(maxX,maxY),(0,0,255),3)
+			img2.append(studentSheet[minY-5:maxY+5, minX-5:maxX+5])  # img == 최종 답안 단어들의 이미지를 저장한 리스트
 			pos = []
 			pos.append(minY)
 			pos.append(maxY)
@@ -439,50 +424,68 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 			pos.append(maxX)
 			position.append(pos)
 
-	for i in range(0, len(img2)):
-		cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
-	os.chdir("/Users/hcy/Desktop/GP/src/")
-	os.system("python3 main.py")           # main.py 실행하면 answerImage에 있는 폴더 모두 실행, txt파일에 정답 저장
+	if state == 1:
+    		
+		for i in range(len(img2)):
+			result = pytesseract.image_to_string(img2[i],config='--psm 6')
+			studentAnswer.append(result)
 
-	# blank 처리 - len(answerList) - studentAnswerList
-	#r = open('C:\\Users\yea\.spyder-py3\\answerSheet\\answerwordLists.txt','rt')
-	# 학생 답지에서 추출한 답들. main.py에서 끌어다 왔음.
-	with codecs.open('/Users/hcy/Desktop/GP/answerSheet/answerwordLists.txt','r') as r:
-		while(1):
-			line = r.readline()
-			try:escape=line.index('\n')
-			except:escape=len(line)
+		for i in range(len(studentAnswer)):
+			print(studentAnswer[i] + "확인")
 
-			if line:
-				studentAnswer.append(line[0:escape].replace(" ",""))
-			else:
-				break
-	r.close()
+		if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
+			os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
+		f = open("/Users/hcy/Desktop/GP/answerSheet/answerwordList.txt","w",-1,"utf-8")
+		for i in range(len(studentAnswer)):
+			f.write(studentAnswer[i]+"\n")
+		f.close()
+		
+		for i in range(0, len(img2)):
+			cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
 
-	print(studentAnswer)
+	if state == 2:
+    		
+		for i in range(0, len(img2)):
+			cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
+		os.chdir("/Users/hcy/Desktop/GP/src/")
+		os.system("python3 main.py")           # main.py 실행하면 answerImage에 있는 폴더 모두 실행, txt파일에 정답 저장
 
+		# 학생 답지에서 추출한 답들. main.py에서 끌어다 왔음.
+		with codecs.open('/Users/hcy/Desktop/GP/answerSheet/answerwordLists.txt','r') as r:
+			while(1):
+				line = r.readline()
+				try:escape=line.index('\n')
+				except:escape=len(line)
+
+				if line:
+					studentAnswer.append(line[0:escape].replace(" ",""))
+				else:
+					break
+		r.close()
+
+		print(studentAnswer)
+
+	print("###########################################")
 	score = len(studentAnswer)
-	print("길이 ", len(studentAnswer)) # 홍
+	print("score : ",score)
 	correctNum = np.zeros(len(trueAnswer))
 	for i in range(0,len(studentAnswer)):
-		correct = 0
-		for j in range(0,len(answerList)):              # answerList는 순서대로 저장돼 있으므로 j에 따라 채점
-			if(studentAnswer[i] == trueAnswer[j]):
-				correct = 1
-				correctNum[j]=1
-				break
-		if correct==0:
-			print(studentAnswer[i])
-			score-=1
-	'''for item in studentAnswer:
-		correct = 0
-		for j in range(0,len(answerList1)):
-			if eq(item,answerList1[j]):
-				correct = 1
-				correctNum[j] = 1
-		if correct==0:
-			print(item)
-			score-=1'''
+		print("true: %s, stud: %s" %(trueAnswer[i],studentAnswer[i]))
+		if studentAnswer[i] == trueAnswer[i] :
+			correctNum[i] = 1
+			
+		else :
+			score = score - 1   		
+		
+		#for j in range(0,len(answerList)):              # answerList는 순서대로 저장돼 있으므로 j에 따라 채점
+		#	if(studentAnswer[i] == trueAnswer[j]):
+		#		correct = 1
+		#		correctNum[j]=1
+		#		break
+		#if correct==0:
+		#	print(studentAnswer[i])
+		#	score-=1
+	
 	print(score)
 	print(correctNum)
 	color = cv2.imread(path)
@@ -504,6 +507,9 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
 
+############################################################################
+print("#####################################################################")
+
 # initialize the window toolkit along with the two image panels
 # 띄어쓰기가 indent
 testSheet = None
@@ -511,6 +517,8 @@ answerSheet = None
 studentSheet = None
 position = []
 answerList = []
+trueAnswer = []
+studentAnswer = []
 
 # 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
 # 숫자 시험지면 상태에 0, 영어 시험지면 상태에 1
