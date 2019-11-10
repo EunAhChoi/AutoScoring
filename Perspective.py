@@ -1,21 +1,36 @@
 import numpy as np 
-import cv2 
-import matplotlib.pyplot as plt 
+import cv2  
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib import pyplot as plt
+import matplotlib.image as mpimg
 
-def point():
-    img = cv2.imread("/Users/hcy/Desktop/ex4.jpeg")
+def point(img):
+    #img = cv2.imread("/Users/hcy/Desktop/ex4.jpeg")
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
     #print(img)
-    
-    #cv2.imshow('imgray', imgray)
-    ret,thresh = cv2.threshold(imgray,127,255,0)
-    image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    print("초반")
+
+    #mask = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2GRAY)
+    #ret,img_binary=cv2.threshold(imgray, 200,255,cv2.THRESH_BINARY)
+
+    #cv2.imshow('imgray', img_binary)
+    ret,thresh = cv2.threshold(imgray,207,255,cv2.THRESH_BINARY)
+
+    cv2.imshow('imgray', thresh)
+    image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+
+    print(contours)
 
     # 경계선을 그리고
-    cnt = contours[4]
+    cnt = contours[0]
     img = cv2.drawContours(img, [cnt], 0, (0,255,0), 3)
     
+    cv2.imshow('img', img)
+
+    print("중반")
+
     maxX = 0
     maxY = 0
     minX = 10000
@@ -71,6 +86,10 @@ def point():
 
     # 이제 해야될 건 이 좌표로 perspective 해보는 거!!
 
+    print("후반")
+    print("shape 는")
+    print(img.shape)
+
     h, w = img.shape[:2] 
     pts1 = np.float32([top, right, left, bottom]) 
     pts2 = np.float32([[0, 0], [1024, 0], [0, h], [1024, h]]) 
@@ -84,10 +103,14 @@ def point():
     cv2.circle(img2, (1024, 0), 20, (0, 255, 0), -1) 
     cv2.circle(img2, (0, h), 20, (0, 0, 255), -1) 
     cv2.circle(img2, (1024, h), 20, (0, 0, 0), -1) 
-    plt.subplot(1, 2, 1), plt.imshow(img), plt.title('image') 
-    plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
-    plt.show() 
+    #plt.subplot(1, 2, 1), plt.imshow(img), plt.title('image') 
+    #plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
+    #plt.show() 
     
+    print("리턴 이전")
+
+    return img2
+
     #print(img)
     
     #for
@@ -107,4 +130,4 @@ def point():
     #cv2.waitKey()
     #cv2.destroyAllWindows()
 
-point()
+#point()

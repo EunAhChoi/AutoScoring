@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# 내가 만든 perspective 함수
+import Perspective
+
 # 이미지 픽셀 차이 보기
 import sys
 from scipy.misc import imread
@@ -125,6 +128,10 @@ def show_score(img1, img2):
 	score, diff = compare_ssim(img1, img2, full = True)
 	print(score)
 
+def doPerspective(img):
+    result = Perspective.point(img)
+    return result
+
 def select1():        # 시험지 선택 함수
 
     global testSheet  # 전역변수선언. 시험지를 저장하게 된다.
@@ -151,6 +158,7 @@ def select2():         # 정답 and 좌표찾기
 	path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장.
 	answerSheet = cv2.imread(path,0) # 답지 경로 찾아서 이미지 파일 객체 생성
 
+	#answerSheet = doPerspective(answerSheet)
 	print(answerSheet.shape)
 	
 	#answerSheet2 = answerSheet + 200
@@ -295,6 +303,7 @@ def select2():         # 정답 and 좌표찾기
 		if abs(maxY - minY) < 5:
 			pass
 		else:
+    		# +- 5 해서 좀 넓게 짤리게 했음. 인식 잘되게
 			img.append(answerSheet[minY-5:maxY+5, minX-5:maxX+5])    # img == 최종 답안 단어들의 이미지를 저장한 리스트
 
 
