@@ -5,8 +5,18 @@ matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
 
-def point(img):
-    #img = cv2.imread("/Users/hcy/Desktop/ex4.jpeg")
+def point(img, shape):
+    
+    img = cv2.resize(img, dsize=shape, interpolation=cv2.INTER_AREA)
+    img = cv2.line(img, (0,0), (shape[0],0), (0, 0, 0), 120)
+    img = cv2.line(img, (0,0), (0,shape[1]), (0, 0, 0), 120)
+    img = cv2.line(img, (shape[0],0), (shape[0],shape[1]), (0, 0, 0), 120)
+    img = cv2.line(img, (0,shape[1]), (shape[0],shape[1]), (0, 0, 0), 120)
+
+    img = cv2.line(img, (60,60), (shape[0]-60,60), (255, 255, 255), 100)
+    img = cv2.line(img, (60,60), (60,shape[1]-60), (255, 255, 255), 100)
+    img = cv2.line(img, (shape[0]-60,60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
+    img = cv2.line(img, (60,shape[1]-60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
     #print(img)
@@ -45,6 +55,13 @@ def point(img):
     rightX = 0
     rightY = 0
 
+    '''
+    아주 좋고
+    일단 그림 90 돌리고
+    원본 코드랑 합치는 작업
+
+    다음 시간에...
+    '''
     # 경계선 그린 거에서 꼭지점 좌표 찾는 부분
     for i in cnt:
         if maxX < i[0][0]:
@@ -91,8 +108,8 @@ def point(img):
     print(img.shape)
 
     h, w = img.shape[:2] 
-    pts1 = np.float32([top, right, left, bottom]) 
-    pts2 = np.float32([[0, 0], [1024, 0], [0, h], [1024, h]]) 
+    pts1 = np.float32([left, top, bottom, right]) 
+    pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]]) 
     M = cv2.getPerspectiveTransform(pts1, pts2) 
     img2 = cv2.warpPerspective(img, M, (w, h)) 
     cv2.circle(img, (top[0], top[1]), 20, (255, 0, 0), -1) 

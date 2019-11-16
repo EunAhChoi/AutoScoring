@@ -7,10 +7,12 @@ img = cv2.imread("/Users/hcy/Desktop/exex.png")
 
 print(img)
 
+temp_shape = (1519, 2062)
+
 plt.imshow(img)
 plt.show()
 
-img2 = Perspective.point(img)
+img2 = Perspective.point(img, temp_shape)
 
 print("#######################")
 
@@ -24,10 +26,12 @@ cv2.circle(img2, (1024, h), 20, (0, 0, 0), -1)
 #print(img2)
 print(img2.shape)
 
-dst = cv2.resize(img2, dsize=(1519, 2062), interpolation=cv2.INTER_AREA)
+#dst = cv2.resize(img2, dsize=(1519, 2062), interpolation=cv2.INTER_AREA)
 
-print(dst.shape)
+#print(dst.shape)
 
-plt.subplot(1, 2, 1), plt.imshow(img2), plt.title('image') 
-plt.subplot(1, 2, 2), plt.imshow(dst), plt.title('perspective') 
+#plt.subplot(1, 2, 1), plt.imshow(img2), plt.title('image') 
+#plt.subplot(1, 2, 2), plt.imshow(dst), plt.title('perspective') 
+
+plt.imshow(img2)
 plt.show()
