@@ -8,15 +8,15 @@ import matplotlib.image as mpimg
 def point(img, shape):
     
     img = cv2.resize(img, dsize=shape, interpolation=cv2.INTER_AREA)
-    img = cv2.line(img, (0,0), (shape[0],0), (0, 0, 0), 120)
-    img = cv2.line(img, (0,0), (0,shape[1]), (0, 0, 0), 120)
-    img = cv2.line(img, (shape[0],0), (shape[0],shape[1]), (0, 0, 0), 120)
-    img = cv2.line(img, (0,shape[1]), (shape[0],shape[1]), (0, 0, 0), 120)
+    #img = cv2.line(img, (0,0), (shape[0],0), (0, 0, 0), 120)
+    #img = cv2.line(img, (0,0), (0,shape[1]), (0, 0, 0), 120)
+    #img = cv2.line(img, (shape[0],0), (shape[0],shape[1]), (0, 0, 0), 120)
+    #img = cv2.line(img, (0,shape[1]), (shape[0],shape[1]), (0, 0, 0), 120)
 
-    img = cv2.line(img, (60,60), (shape[0]-60,60), (255, 255, 255), 100)
-    img = cv2.line(img, (60,60), (60,shape[1]-60), (255, 255, 255), 100)
-    img = cv2.line(img, (shape[0]-60,60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
-    img = cv2.line(img, (60,shape[1]-60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
+    #img = cv2.line(img, (60,60), (shape[0]-60,60), (255, 255, 255), 100)
+    #img = cv2.line(img, (60,60), (60,shape[1]-60), (255, 255, 255), 100)
+    #img = cv2.line(img, (shape[0]-60,60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
+    #img = cv2.line(img, (60,shape[1]-60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
     #print(img)
@@ -28,7 +28,9 @@ def point(img, shape):
     #cv2.imshow('imgray', img_binary)
     ret,thresh = cv2.threshold(imgray,207,255,cv2.THRESH_BINARY)
 
-    cv2.imshow('imgray', thresh)
+    plt.imshow(thresh)
+    plt.show()
+
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
     print(contours)
@@ -37,7 +39,8 @@ def point(img, shape):
     cnt = contours[0]
     img = cv2.drawContours(img, [cnt], 0, (0,255,0), 3)
     
-    cv2.imshow('img', img)
+    plt.imshow(img)
+    plt.show()
 
     print("중반")
 
@@ -59,7 +62,6 @@ def point(img, shape):
     아주 좋고
     일단 그림 90 돌리고
     원본 코드랑 합치는 작업
-
     다음 시간에...
     '''
     # 경계선 그린 거에서 꼭지점 좌표 찾는 부분
@@ -91,60 +93,120 @@ def point(img, shape):
     print(minX)
     print(minY)
     
-    right = [rightX, rightY]
-    left = [leftX, leftY]
-    top = [topX, topY]
-    bottom = [bottomX, bottomY]
+    if(maxX - minX >500 and maxY - minY>500):
+        print("if문!!!!!!!!!!!!!!!!!!!!!")
+        right = [rightX, rightY]
+        left = [leftX, leftY]
+        top = [topX, topY]
+        bottom = [bottomX, bottomY]
 
-    print(top)
-    print(left)
-    print(right)
-    print(bottom)
+        print(top)
+        print(left)
+        print(right)
+        print(bottom)
 
-    # 이제 해야될 건 이 좌표로 perspective 해보는 거!!
+        # 이제 해야될 건 이 좌표로 perspective 해보는 거!!
 
-    print("후반")
-    print("shape 는")
-    print(img.shape)
+        print("후반")
+        print("shape 는")
+        print(img.shape)
 
-    h, w = img.shape[:2] 
-    pts1 = np.float32([left, top, bottom, right]) 
-    pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]]) 
-    M = cv2.getPerspectiveTransform(pts1, pts2) 
-    img2 = cv2.warpPerspective(img, M, (w, h)) 
-    cv2.circle(img, (top[0], top[1]), 20, (255, 0, 0), -1) 
-    cv2.circle(img, (right[0], right[1]), 20, (0, 255, 0), -1) 
-    cv2.circle(img, (left[0], left[1]), 20, (0, 0, 255), -1) 
-    cv2.circle(img, (bottom[0], bottom[1]), 20, (0, 0, 0), -1) 
-    cv2.circle(img2, (0, 0), 20, (255, 0, 0), -1) 
-    cv2.circle(img2, (1024, 0), 20, (0, 255, 0), -1) 
-    cv2.circle(img2, (0, h), 20, (0, 0, 255), -1) 
-    cv2.circle(img2, (1024, h), 20, (0, 0, 0), -1) 
-    #plt.subplot(1, 2, 1), plt.imshow(img), plt.title('image') 
-    #plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
-    #plt.show() 
+        h, w = img.shape[:2] 
+        pts1 = np.float32([left, top, bottom, right]) 
+        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]]) 
+        M = cv2.getPerspectiveTransform(pts1, pts2) 
+        img2 = cv2.warpPerspective(img, M, (w, h)) 
+        cv2.circle(img, (top[0], top[1]), 20, (255, 0, 0), -1) 
+        cv2.circle(img, (right[0], right[1]), 20, (0, 255, 0), -1) 
+        cv2.circle(img, (left[0], left[1]), 20, (0, 0, 255), -1) 
+        cv2.circle(img, (bottom[0], bottom[1]), 20, (0, 0, 0), -1) 
+        cv2.circle(img2, (0, 0), 20, (255, 0, 0), -1) 
+        cv2.circle(img2, (1024, 0), 20, (0, 255, 0), -1) 
+        cv2.circle(img2, (0, h), 20, (0, 0, 255), -1) 
+        cv2.circle(img2, (1024, h), 20, (0, 0, 0), -1) 
+        #plt.subplot(1, 2, 1), plt.imshow(img), plt.title('image') 
+        #plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
+        #plt.show() 
+        
+        print("리턴 이전")
+
+        return img2
+
+    else:
+        print("else 문!!!!!!!!!!!!!!!!!!!!!")
+        img = cv2.line(img, (0,0), (shape[0],0), (0, 0, 0), 120)
+        img = cv2.line(img, (0,0), (0,shape[1]), (0, 0, 0), 120)
+        img = cv2.line(img, (shape[0],0), (shape[0],shape[1]), (0, 0, 0), 120)
+        img = cv2.line(img, (0,shape[1]), (shape[0],shape[1]), (0, 0, 0), 120)
+
+        img = cv2.line(img, (60,60), (shape[0]-60,60), (255, 255, 255), 100)
+        img = cv2.line(img, (60,60), (60,shape[1]-60), (255, 255, 255), 100)
+        img = cv2.line(img, (shape[0]-60,60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
+        img = cv2.line(img, (60,shape[1]-60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
+
+        imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
-    print("리턴 이전")
+        #print(img)
+        print("초반")
 
-    return img2
+        #mask = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2GRAY)
+        #ret,img_binary=cv2.threshold(imgray, 200,255,cv2.THRESH_BINARY)
 
-    #print(img)
-    
-    #for
-    #cnt = contours[0]
+        #cv2.imshow('imgray', img_binary)
+        ret,thresh = cv2.threshold(imgray,207,255,cv2.THRESH_BINARY)
 
-    #leftmost = tuple(cnt[cnt[:,:,0].argmin()][0])
-    #rightmost = tuple(cnt[cnt[:,:,0].argmax()][0])
-    #topmost = tuple(cnt[cnt[:,:,1].argmin()][0])
-    #bottommost = tuple(cnt[cnt[:,:,1].argmax()][0])
+        plt.imshow(thresh)
+        plt.show()
 
-    #cv2.circle(img, leftmost, 10, (0,0,255), -1)
-    #cv2.circle(img, rightmost, 10, (0,0,255), -1)
-    #cv2.circle(img, topmost, 10, (0,0,255), -1)
-    #cv2.circle(img, bottommost, 5, (0,255,255), -1)
+        image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-    #cv2.imshow('img', img)
-    #cv2.waitKey()
-    #cv2.destroyAllWindows()
+        print(contours)
+
+        # 경계선을 그리고
+        cnt = contours[0]
+        img = cv2.drawContours(img, [cnt], 0, (0,255,0), 3)
+        
+        plt.imshow(img)
+        plt.show()
+
+        print("중반")
+
+
+        right = [shape[0]-60, shape[1]-60]
+        left = [60, 60]
+        top = [shape[0]-60, 60]
+        bottom = [60, shape[1]-60]
+
+        print(top)
+        print(left)
+        print(right)
+        print(bottom)
+
+        # 이제 해야될 건 이 좌표로 perspective 해보는 거!!
+
+        print("후반")
+        print("shape 는")
+        print(img.shape)
+
+        h, w = img.shape[:2] 
+        pts1 = np.float32([left, top, bottom, right]) 
+        pts2 = np.float32([[0, 0], [w, 0], [0, h], [w, h]]) 
+        M = cv2.getPerspectiveTransform(pts1, pts2) 
+        img2 = cv2.warpPerspective(img, M, (w, h)) 
+        cv2.circle(img, (top[0], top[1]), 20, (255, 0, 0), -1) 
+        cv2.circle(img, (right[0], right[1]), 20, (0, 255, 0), -1) 
+        cv2.circle(img, (left[0], left[1]), 20, (0, 0, 255), -1) 
+        cv2.circle(img, (bottom[0], bottom[1]), 20, (0, 0, 0), -1) 
+        cv2.circle(img2, (0, 0), 20, (255, 0, 0), -1) 
+        cv2.circle(img2, (1024, 0), 20, (0, 255, 0), -1) 
+        cv2.circle(img2, (0, h), 20, (0, 0, 255), -1) 
+        cv2.circle(img2, (1024, h), 20, (0, 0, 0), -1) 
+        #plt.subplot(1, 2, 1), plt.imshow(img), plt.title('image') 
+        #plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
+        #plt.show() 
+        
+        print("리턴 이전")
+
+        return img2
 
 #point()

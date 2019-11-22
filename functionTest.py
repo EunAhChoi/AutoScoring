@@ -3,16 +3,21 @@ import numpy as np
 import cv2 
 import matplotlib.pyplot as plt 
 
+img_original = cv2.imread("/Users/hcy/Desktop/answerNumber.jpeg")
 img = cv2.imread("/Users/hcy/Desktop/exex.png")
 
-print(img)
-
-temp_shape = (1519, 2062)
-
+original_shape = img_original.shape[:2]
+img_shape = img.shape[:2]
+#print(original_shape)
+#print(img_shape)
 plt.imshow(img)
 plt.show()
 
-img2 = Perspective.point(img, temp_shape)
+
+#original_shape = (1509, 2062)
+#img_shape = (500, 500)
+
+img2 = Perspective.point(img_original, original_shape)
 
 print("#######################")
 
