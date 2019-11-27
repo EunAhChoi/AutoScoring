@@ -7,7 +7,9 @@ import matplotlib.image as mpimg
 
 def point(img, shape):
     
+    shape = (shape[1], shape[0])
     img = cv2.resize(img, dsize=shape, interpolation=cv2.INTER_AREA)
+    #img = cv2.resize(img, dsize=shape)
     #img = cv2.line(img, (0,0), (shape[0],0), (0, 0, 0), 120)
     #img = cv2.line(img, (0,0), (0,shape[1]), (0, 0, 0), 120)
     #img = cv2.line(img, (shape[0],0), (shape[0],shape[1]), (0, 0, 0), 120)
@@ -19,8 +21,10 @@ def point(img, shape):
     #img = cv2.line(img, (60,shape[1]-60), (shape[0]-60,shape[1]-60), (255, 255, 255), 100)
     imgray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
     
-    #print(img)
-    print("초반")
+    print("img 쉐잎은?")
+    print(img.shape)  
+    print("gray 쉐잎은?")
+    print(imgray.shape)
 
     #mask = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2GRAY)
     #ret,img_binary=cv2.threshold(imgray, 200,255,cv2.THRESH_BINARY)
@@ -28,19 +32,19 @@ def point(img, shape):
     #cv2.imshow('imgray', img_binary)
     ret,thresh = cv2.threshold(imgray,207,255,cv2.THRESH_BINARY)
 
-    plt.imshow(thresh)
-    plt.show()
+    #plt.imshow(thresh)
+    #plt.show()
 
     image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-    print(contours)
+    #print(contours)
 
     # 경계선을 그리고
     cnt = contours[0]
     img = cv2.drawContours(img, [cnt], 0, (0,255,0), 3)
     
-    plt.imshow(img)
-    plt.show()
+    #plt.imshow(img)
+    #plt.show()
 
     print("중반")
 
@@ -58,12 +62,7 @@ def point(img, shape):
     rightX = 0
     rightY = 0
 
-    '''
-    아주 좋고
-    일단 그림 90 돌리고
-    원본 코드랑 합치는 작업
-    다음 시간에...
-    '''
+
     # 경계선 그린 거에서 꼭지점 좌표 찾는 부분
     for i in cnt:
         if maxX < i[0][0]:
@@ -155,19 +154,19 @@ def point(img, shape):
         #cv2.imshow('imgray', img_binary)
         ret,thresh = cv2.threshold(imgray,207,255,cv2.THRESH_BINARY)
 
-        plt.imshow(thresh)
-        plt.show()
+        #plt.imshow(thresh)
+        #plt.show()
 
         image, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
-        print(contours)
+        #print(contours)
 
         # 경계선을 그리고
         cnt = contours[0]
         img = cv2.drawContours(img, [cnt], 0, (0,255,0), 3)
         
-        plt.imshow(img)
-        plt.show()
+        #plt.imshow(img)
+        #plt.show()
 
         print("중반")
 
@@ -205,7 +204,6 @@ def point(img, shape):
         #plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
         #plt.show() 
         
-        print("리턴 이전")
 
         return img2
 
