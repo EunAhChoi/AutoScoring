@@ -2,6 +2,7 @@
 # 내가 만든 perspective 함수
 import Perspective
 
+
 # 이미지 픽셀 차이 보기
 import sys
 from scipy.misc import imread
@@ -21,7 +22,6 @@ import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
-
 
 # Tkinter는 GUI에 대한 표준 python 인터페이스이며 window 창을 생성할 수 있음.
 from tkinter import * # Toolkit interface의 약자
@@ -47,6 +47,25 @@ from operator import eq # 산술연산 모듈, 항등 연산자
 import codecs # 인코딩 관련 모듈
 import warnings
 warnings.filterwarnings(action='ignore')
+
+
+def changeDimension(arr):
+   
+    # 2차원 -> 3차원 변경 
+    if(arr.ndim ==2):
+        d3 = arr.ravel()
+        d3 = np.hstack((d3,d3,d3))
+        d3 = d3.reshape(a.shape[0], a.shape[1], 3)
+        return d3
+    
+    # 3차원 -> 2차원 변경
+    if(arr.ndim ==3):
+        d2 = arr.ravel()
+        slice_range = arr.shape[0] * arr.shape[1]
+        d2 = d2[0:slice_range]
+        d2 = d2.reshape(arr.shape[0], arr.shape[1])
+        return d2
+
 
 def dif_color():
 	# 색상 범위 설정
@@ -86,6 +105,7 @@ def dif_color():
 	dilation = cv2.dilate(closing, kernel, iterations = 1)
 	# 결과 이미지 생성
 	cv2.imwrite("/Users/hcy/Desktop/result2.png", dilation)
+
 
 # 이미지 픽셀 나타내보기
 def pixel(i1, i2):
@@ -128,91 +148,55 @@ def show_score(img1, img2):
 	score, diff = compare_ssim(img1, img2, full = True)
 	print(score)
 
-def doPerspective(img):
-    result = Perspective.point(img)
-    return result
 
 def select1():        # 시험지 선택 함수
 
-    global testSheet  # 전역변수선언. 시험지를 저장하게 된다.
-    path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장. 
-	                                	# GUI 창이 열리고 거기에다가 입력하게 된다!
-    testSheet = cv2.imread(path,0) # 이미지 파일을 읽기 위한 객체를 리턴해주는 함수.
+	global testSheet, main_shape  # 전역변수선언. 시험지를 저장하게 된다.
+	path = filedialog.askopenfilename()
+	
+	testSheet = cv2.imread(path, 0) # 이미지 파일을 읽기 위한 객체를 리턴해주는 함수.
 	# 0은 gray로 읽겠다는 의미 (cv2.IMREAD_GRAYSCALE)
 
-	# 사진 픽셀 가져옴
-    print(testSheet.shape)
-	# 명암 조절
-    #testSheet2 = testSheet +100
-    #testSheet3 = testSheet -100
-    #cv2.imshow("test", testSheet)
-    #cv2.imshow("-100", testSheet2)
-    #cv2.imshow("+100", testSheet3)
+	main_shape = testSheet.shape
+
+	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
+	#testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
+
+	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
+
+	testSheet = Perspective.point(testSheet, main_shape)
+
+	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_RGB2GRAY)
+
+	
 
 ##############################################################################
 
 # 인덴트 탭
 def select2():         # 정답 and 좌표찾기
 	# answerSheet : 정답지 저장하는 곳. position : ??, answerList : 정답 추출?
-	global answerSheet, position, answerList
+	global position, answerList, answerSheet
 	path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장.
 	answerSheet = cv2.imread(path,0) # 답지 경로 찾아서 이미지 파일 객체 생성
 
-	#answerSheet = doPerspective(answerSheet)
+	#answerSheet = changeDimension(answerSheet)
+
+	print("main_shape :", main_shape)
 	print(answerSheet.shape)
-	
-	#answerSheet2 = answerSheet + 200
-	#cv2.imshow("original", answerSheet)
-	#cv2.imshow("modification", answerSheet2)
 
-    # 이미지 노이즈 제거. (http://www.gisdeveloper.co.kr/?p=7168)
-	#dst = cv2.fastNlMeansDenoising(answerSheet, None, 10, 7, 21)
-	# 픽셀 차이 보기
-	#pixel(testSheet, answerSheet)
+	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
+	answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_GRAY2RGB)
 
-	# 이미치 차이 score
-	#show_score(testSheet, answerSheet)
+	answerSheet = Perspective.point(answerSheet, main_shape)
 
-	# 색으로 구별
-	#dif_color()
-
-	
-	# 이미지 서로 다른 부분 찾는 코드    
-	# 정확히 두 이미지간의 다른 부분의 (x, y)-coordinate location을 찾아줌.
-	# compare_ssim : 두 이미지 사이의 구조적 유사성 지수를 계산하여 different 이미지가 반환되도록 한다.
-	# 시험지가 저장된 객체와 답지가 저장된 객체를 파라미터로
-	# https://ng1004.tistory.com/89 <-- 여기서 퍼온듯
-	# compute the Structural Similarity Index (SSIM) between the two
-	# images, ensuring that the difference image is returned
-	
-	#(score, diff) = compare_ssim(testSheet,answerSheet, full=True)
-	#diff = cv2.absdiff(testSheet, answerSheet)
-	
-	# score는 두 이미지의 Structural Similarity index를 저장. 범위는 -1~1까지. 1은 perfect match를 뜻함.
-	# diff는 실제 차이 이미지를 저장한다. floating point data 로 저장되며 0~1까지 범위를 가짐
-	# 우리는 이를 8bit unsigned integer (0~255)로 이루어진 array로 convert해야됨. (OpenCV를 이용하기 위해) 
-	
-	#diff = (diff*255).astype("uint8")
-	
-	# threshold the difference image, followed by finding contours to
-	# obtain the regions of the two input images that differ
-	# OpenCV 이미지 프로세싱에서 thresholding을 적용하려면 grayscale이미지로 변환하여 적용해야한다.
-
-	#thresh = cv2.threshold(diff, 130,255,cv2.THRESH_BINARY)
-	#thresh = cv2.threshold(diff,130,255,cv2.THRESH_BINARY)
-	#thresh = cv2.adaptiveThreshold(diff, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,11, 2)
-
-	#cv2.imwrite("/Users/hcy/Desktop/result3.png", thresh)
-	# thresh 변수의 경계(윤곽선)를 찾음.
-	
-	#cnts = cv2.findContours(thresh.copy(),cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	#cnts = cnts[0] if imutils.is_cv2() else cnts[1]
-
+	answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_RGB2GRAY)
 
 	# 이미지의 차이를 실제 png 파일로 만들어주는 코드 추가
 	diff = cv2.absdiff(testSheet, answerSheet)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 	#diff = cv2.GaussianBlur(diff,(3,3),0)
+	# "펄스펙티브에 있던 녀석임 밑이 ㅇㅋ?"
+	#mask = cv2.cvtColor(diff,cv2.COLOR_BGR2GRAY)
 
 	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result6.png", img_binary)
@@ -220,17 +204,6 @@ def select2():         # 정답 and 좌표찾기
 	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
-	#result = pytesseract.image_to_string(Image.open("/Users/hcy/Desktop/result6.png"),lang='eng')
-	#result = result.replace(" ","")
-	#result = str(result)
-
-	#print(result)
-
-	#if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
-	#	os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
-	#f = open("/Users/hcy/Desktop/GP/answerSheet/answerListTest.txt","w",-1,"utf-8")
-	#f.write(result)
-	#f.close()
 
 	th = 1
 	imask = mask>th
@@ -309,13 +282,18 @@ def select2():         # 정답 and 좌표찾기
 
 	if state == 1:
 
+		for i in range(0, len(img)):
+    			cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
+
 		for i in range(len(img)):
 			result = pytesseract.image_to_string(img[i],config='--psm 6')
 			trueAnswer.append(result)
-
+		print("Extract answer...")
+		print("----------------------------")
 		for i in range(len(trueAnswer)):
 			print(trueAnswer[i])
-
+		print("----------------------------")
+		print("Extract Complete!!!")
 		if not (os.path.isdir("/Users/hcy/Desktop/GP/answerSheet")):
 			os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answerSheet"))
 		f = open("/Users/hcy/Desktop/GP/answerSheet/answerNumberList.txt","w",-1,"utf-8")
@@ -349,8 +327,12 @@ def select2():         # 정답 and 좌표찾기
 					break
 		r.close()
 
+		print("Extract answer...")
+		print("----------------------------")
 		for i in range(len(trueAnswer)):
 			print(trueAnswer[i])
+		print("----------------------------")
+		print("Extract Complete!!!")
 
 #################################################################################
 
@@ -358,19 +340,22 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	global studentSheet
 	path = filedialog.askopenfilename()
 	studentSheet = cv2.imread(path,0)
+	#studentSheet = cv2.imread("/Users/hcy/Desktop/answerNumber.jpeg")
+
+	#studentSheet = Perspective.point(studentSheet, studentSheet.shape)
+
 	if not (os.path.isdir("/Users/hcy/Desktop/GP/answer")):
 		os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answer"))
-	
-	#(score, diff) = compare_ssim(testSheet, studentSheet, full=True)
-	
-	#diff = (diff * 255).astype("uint8")
-	
-	#thresh = cv2.threshold(diff, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-	
-	#cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	#cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
+	studentSheet = cv2.cvtColor(studentSheet, cv2.COLOR_GRAY2RGB)
+
+	studentSheet = Perspective.point(studentSheet, main_shape)
+
+	studentSheet = cv2.cvtColor(studentSheet, cv2.COLOR_RGB2GRAY)
 
 	diff = cv2.absdiff(testSheet, studentSheet)
+	#mask = cv2.cvtColor(diff, cv2.COLOR_RGB2GRAY)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 
 	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
@@ -486,15 +471,6 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		else :
 			score = score - 1   		
 		
-		#for j in range(0,len(answerList)):              # answerList는 순서대로 저장돼 있으므로 j에 따라 채점
-		#	if(studentAnswer[i] == trueAnswer[j]):
-		#		correct = 1
-		#		correctNum[j]=1
-		#		break
-		#if correct==0:
-		#	print(studentAnswer[i])
-		#	score-=1
-	
 	print(score)
 	print(correctNum)
 	color = cv2.imread(path)
@@ -528,6 +504,8 @@ position = []
 answerList = []
 trueAnswer = []
 studentAnswer = []
+main_shape = ()
+
 
 # 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
 # 숫자 시험지면 상태에 0, 영어 시험지면 상태에 1
@@ -588,3 +566,4 @@ btn2.grid(column = 0, row = 2, padx = '15', pady = '15', ipadx = '15', ipady = '
 
 # kick off the GUI
 sheet.mainloop()
+
