@@ -5,6 +5,7 @@ matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
 import math
+from numpy import linalg
 
 def point(img, shape):
     
@@ -201,25 +202,13 @@ def point(img, shape):
 #point()
 
 
-
-
-
-
-
-
-
 def distance(X,Y,X2,Y2):
     return math.sqrt(pow(X-X2,2) + pow(Y-Y2,2))
 
 
+def transform(img, empty):
 
-
-
-
-
-def transform(img):
-
-
+    empty = cv2.resize(empty, (900,900), interpolation=cv2.INTER_AREA)
     imgBlur = cv2.medianBlur(img, 5)
     #img = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)    
     imgray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
@@ -482,7 +471,19 @@ def transform(img):
         plt.subplot(1, 2, 2), plt.imshow(img2), plt.title('perspective') 
         plt.show() 
         
+        print("M")
+        print(M)
+
         print("최종 결과 shape ", img2.shape)
+
+        N = linalg.inv(M)
+        print(N)
+
+        tempEmpty = cv2.warpPerspective(empty, N, (900, 900))
+        
+        plt.subplot(1, 2, 1), plt.imshow(empty), plt.title('empty') 
+        plt.subplot(1, 2, 2), plt.imshow(tempEmpty), plt.title('tempEmpty')
+        plt.show()
 
         return img2
 
