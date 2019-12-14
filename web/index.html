@@ -143,13 +143,13 @@
             <img class="img-fluid" width ='230'src="img/testsheet/type.png" alt="">
             <br> <br>
             <h3 class="h4 mb-2">TestSheet Type</h3>
-            <p class="text-muted mb-0">숫자와 영어시험지 유형을 선택하세요</p>
+            <p class="text-muted mb-0">Select a test paper type</p>
             <!-- 파일 선택 -->
             <form method="POST" action="/test_type">
               Number  <input type="radio" value = "1" name="myradio"></input>
               English  <input type="radio" value = "2" name="myradio"></input>
               <input type="submit" class="btn btn-light btn-xl" ></input>
-            </form>            
+            </form>     <br>   
           </div>
         </div>
         
@@ -157,13 +157,15 @@
           <div class="mt-5">
             <img class="img-fluid" width ='230'src="img/testsheet/empty.png" alt="">
             <h3 class="h4 mb-2">Empty Sheet</h3>
-            <p class="text-muted mb-0">빈 시험지를 선택</p>
+            <p class="text-muted mb-0">Select blank test paper</p>
+            <br>
             <!-- 파일 선택 -->
           
             <form action="http://localhost:5000/EmptySheet_uploaded" 
             method="POST" enctype="multipart/form-data" >    
             <input type="file" name="EmptySheet" ></input>
             <input type="submit"  class="btn btn-light btn-xl" ></input>
+            <br><br>
             </form>
           </div>
         </div>
@@ -171,11 +173,13 @@
           <div class="mt-5">
             <img class="img-fluid" width ='230'src="img/testsheet/answer.png" alt="">
             <h3 class="h4 mb-2">Answer Sheet</h3>
-            <p class="text-muted mb-0">답안지 선택 </p>
+            <p class="text-muted mb-0">Select answer sheet </p>
+            <br>
             <form action="http://localhost:5000/AnswerSheet_uploaded" 
             method="POST" enctype="multipart/form-data">
             <input type="file" name="AnswerSheet"></input>
             <input type="submit" class="btn btn-light btn-xl" ></input>
+            <br><br><br>
       </form>
           </div>
         </div>
@@ -183,7 +187,8 @@
           <div class="mt-5">
             <i class="fas fa-4x fa-pen text-primary mb-4"></i>
             <h3 class="h4 mb-2">Student Sheet</h3>
-            <p class="text-muted mb-0">학생 시험지를 선택하세요</p>
+            <p class="text-muted mb-0">Select a student test paper</p>
+            <br>
             <form action="http://localhost:5000/StudentSheet_uploaded" 
             method="POST" enctype="multipart/form-data">
             <input type="file" name="StudentSheet"></input>
