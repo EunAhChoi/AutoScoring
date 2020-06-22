@@ -15,11 +15,16 @@ from SamplePreprocessor import preprocess
 
 class FilePaths:
 	"filenames and paths to data"
-	fnCharList = '/Users/hcy/Desktop/GP/model/charList.txt'
-	fnAccuracy = '/Users/hcy/Desktop/GP/model/accuracy.txt'
-	fnTrain = '/Users/hcy/Desktop/GP/data/'
-	fnInfer = '/Users/hcy/Desktop/GP/answer/'
-	fnCorpus = '/Users/hcy/Desktop/GP/data/corpus.txt'
+	#fnCharList = '/Users/hcy/Desktop/GP/model/charList.txt'
+    fnCharList = './model/charList.txt'
+	#fnAccuracy = '/Users/hcy/Desktop/GP/model/accuracy.txt'
+    fnAccuracy = './model/accuracy.txt'
+	#fnTrain = '/Users/hcy/Desktop/GP/data/'
+    fnTrain = './data/'
+	#fnInfer = '/Users/hcy/Desktop/GP/answer/'
+    fnInfer = './result/answer/'
+	#fnCorpus = '/Users/hcy/Desktop/GP/data/corpus.txt'
+    fnCorpus = './data/corpus.txt'
 
 
 def train(model, loader):
@@ -122,7 +127,8 @@ def infer(model, fnImg):
         print('probability:', probability[0])
         wordList.append(recognized[0])
     #f = open("C:\\Users\\yea\\.spyder-py3\\answerSheet\\answerwordLists.txt","w",encoding='utf-8')
-    with codecs.open("/Users/hcy/Desktop/GP/answerSheet/answerwordLists.txt","w",encoding='utf8') as f:
+    with #codecs.open("/Users/hcy/Desktop/GP/answerSheet/answerwordLists.txt","w",encoding='utf8') as f:
+        codecs.open(".result/answerSheet/answerwordLists.txt","w",encoding='utf8') as f:
         for i in range(0, len(wordList)):
             f.write(wordList[i]+"\n")
     #f.write(recognized[0])

@@ -28,7 +28,7 @@ class DataLoader:
 	def __init__(self, filePath, batchSize, imgSize, maxTextLen):
 		"loader for dataset at given location, preprocess images and text according to parameters"
 
-		assert filePath[-1]=='/Users/hcy/Desktop/GP/data/'
+		assert filePath[-1]=='./data/'
 
 		self.dataAugmentation = False
 		self.currIdx = 0

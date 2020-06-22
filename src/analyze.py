@@ -16,11 +16,16 @@ from SamplePreprocessor import preprocess
 # constants like filepaths
 class Constants:
 	"filenames and paths to data"
-	fnCharList = '/Users/hcy/Desktop/GP/model/charList.txt'
-	fnAnalyze = '/Users/hcy/Desktop/GP/data/analyze.png'
-	fnPixelRelevance = '/Users/hcy/Desktop/GP/data/pixelRelevance.npy'
-	fnTranslationInvariance = '/Users/hcy/Desktop/GP/data/translationInvariance.npy'
-	fnTranslationInvarianceTexts = '/Users/hcy/Desktop/GP/data/translationInvarianceTexts.pickle'
+	#fnCharList = '/Users/hcy/Desktop/GP/model/charList.txt'
+    fnCharList = './model/charList.txt'
+	#fnAnalyze = '/Users/hcy/Desktop/GP/data/analyze.png'
+    fnAnalyze = './data/analyze.png'
+	#fnPixelRelevance = '/Users/hcy/Desktop/GP/data/pixelRelevance.npy'
+    fnPixelRelevance = './data/pixelRelevance.npy'
+	#fnTranslationInvariance = '/Users/hcy/Desktop/GP/data/translationInvariance.npy'
+    fnTranslationInvariance = './data/translationInvariance.npy'
+	#fnTranslationInvarianceTexts = '/Users/hcy/Desktop/GP/data/translationInvarianceTexts.pickle'
+    fnTranslationInvarianceTexts = './data/translationInvarianceTexts.pickle'
 	gtText = 'are'
 	distribution = 'histogram' # 'histogram' or 'uniform'
 
