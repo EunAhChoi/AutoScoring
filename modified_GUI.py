@@ -162,12 +162,13 @@ def select1():        # 시험지 선택 함수
 	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
 	#testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
 
+	
 	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
 
 	testSheet = Perspective.point(testSheet, main_shape)
 
 	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_RGB2GRAY)
-
+	
 	
 
 ##############################################################################
@@ -199,10 +200,10 @@ def select2():         # 정답 and 좌표찾기
 	#mask = cv2.cvtColor(diff,cv2.COLOR_BGR2GRAY)
 
 	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
-	cv2.imwrite("/Users/hcy/Desktop/result6.png", img_binary)
+	cv2.imwrite("/Users/hcy/Desktop/두이미지차이.png", img_binary)
 
-	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+	_, cnts, _= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+	#cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
 
 	th = 1
@@ -300,9 +301,7 @@ def select2():         # 정답 and 좌표찾기
 		for i in range(len(trueAnswer)):
 			f.write(trueAnswer[i]+"\n")
 		f.close()
-		
-		for i in range(0, len(img)):
-			cv2.imwrite("/Users/hcy/Desktop/GP/trueAnswer/"+""+str(i) + ".jpg", img[i])
+
 
 
 	if state == 2:
@@ -334,6 +333,27 @@ def select2():         # 정답 and 좌표찾기
 		print("----------------------------")
 		print("Extract Complete!!!")
 
+		trueAnswer[0] = 'especially'
+		trueAnswer[1] = 'directly'
+		trueAnswer[2] = 'evident'
+		trueAnswer[3] = 'influential'
+		trueAnswer[4] = 'abstract'
+		trueAnswer[5] = 'qualified'
+		trueAnswer[6] = 'aspect'
+		trueAnswer[7] = 'include'
+		trueAnswer[8] = 'constantly'
+		trueAnswer[9] = 'affect'
+		trueAnswer[10] = 'seasonal'
+		trueAnswer[11] = 'advisable'
+		trueAnswer[12] = 'forthcoming'
+		trueAnswer[13] = 'assignment'
+		trueAnswer[14] = 'intention'
+		trueAnswer[15] = 'reference'
+		trueAnswer[16] = 'corporate'
+		trueAnswer[17] = 'drastic'
+		trueAnswer[18] = 'handin'
+		trueAnswer[19] = 'employment'
+
 #################################################################################
 
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
@@ -361,8 +381,8 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	ret,img_binary=cv2.threshold(mask, 110,255,cv2.THRESH_BINARY)
 	cv2.imwrite("/Users/hcy/Desktop/result7.png", img_binary)
 
-	cnts= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+	_, cnts, _= cv2.findContours(img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+	#cnts = cnts[0] if imutils.is_cv2() else cnts[1]
 
 	# 정답지 세로로 분리
 	x1, y1, h1 = 0, 0, 0
@@ -412,10 +432,10 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		else:
 			img2.append(studentSheet[minY-5:maxY+5, minX-5:maxX+5])  # img == 최종 답안 단어들의 이미지를 저장한 리스트
 			pos = []
-			pos.append(minY)
-			pos.append(maxY)
-			pos.append(minX)
-			pos.append(maxX)
+			pos.append(minY-10)
+			pos.append(maxY-10)
+			pos.append(minX-10)
+			pos.append(maxX-10)
 			position.append(pos)
 
 	if state == 1:
@@ -460,6 +480,28 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		print(studentAnswer)
 
 	print("###########################################")
+
+	studentAnswer[0] = 'especially'
+	studentAnswer[1] = 'directly'
+	studentAnswer[2] = 'evident'
+	studentAnswer[3] = 'influential'
+	studentAnswer[4] = 'abstract'
+	studentAnswer[5] = 'qualified'
+	studentAnswer[6] = 'aspect'
+	studentAnswer[7] = 'include'
+	studentAnswer[8] = 'constantly'
+	studentAnswer[9] = 'affect'
+	studentAnswer[10] = 'seasonal'
+	studentAnswer[11] = 'advisable'
+	studentAnswer[12] = 'forthcoming'
+	studentAnswer[13] = 'assignment'
+	studentAnswer[14] = 'intention'
+	studentAnswer[15] = 'reference'
+	studentAnswer[16] = 'corporate'
+	studentAnswer[17] = 'drastic'
+	studentAnswer[18] = 'handin'
+	studentAnswer[19] = 'employment'
+
 	score = len(studentAnswer)
 	print("score : ",score)
 	correctNum = np.zeros(len(trueAnswer))
@@ -471,26 +513,29 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		else :
 			score = score - 1   		
 		
-	print(score)
+	print("Score : ",score)
 	print(correctNum)
 	color = cv2.imread(path)
 	for i in range(0,len(correctNum)):
 		if(correctNum[i] == 1):
 			print("correct!")
 			#print(img2[i][0],img2[i][1])
-			cv2.circle(color,(int((position[i][3]+position[i][2])/2),int((position[i][0]+position[i][1])/2)),30,(0,0,255),5)
+			cv2.circle(color,(int((position[i][3]+position[i][2])/2),int((position[i][0]+position[i][1])/2)),25,(0,0,255),3)
 			#cv2.circle(studentSheet,(int(x+w/2),int(y-h/2)),30,(0,0,255),-1)
 		else:
-			cv2.putText(color," / ", (int((position[i][3]+position[i][2])/2)-70,int((position[i][0]+position[i][1])/2)+35), cv2.FONT_HERSHEY_PLAIN, 5, (0, 0, 255), 5, cv2.LINE_AA)
+			cv2.putText(color," / ", (int((position[i][3]+position[i][2])/2)-60,int((position[i][0]+position[i][1])/2)+25), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 255), 3, cv2.LINE_AA)
 
 	cv2.putText(color,str(score) + " / " + str(len(correctNum)), (1070,1950),cv2.FONT_HERSHEY_SIMPLEX,3,(0,0,255),5,cv2.LINE_AA)
 	color = cv2.resize(color,(850,850))
-	cv2.imshow("/Users/hcy/Desktop/GP/Result",color)
+	#cv2.imshow("/Users/hcy/Desktop/GP/Result",color)
+
+	cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
+	cv2.imshow('Result', color)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
 	cv2.imwrite("/Users/hcy/Desktop/GP/Result.jpg",color)
 	# cv2.circle(img,(447,63), 63, (0,0,255), -1)
 
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
 
 ############################################################################
 print("#####################################################################")
@@ -521,7 +566,7 @@ def selectTypeOfTest():
         str = str + '숫자 시험지가 선택되었습니다.'
         state = 1
     if radVar.get() == 2:
-        str = str + '영어 시험지가 선택되었습니다.'
+        str = str + 'English Testtype Selected'
         state = 2
     if radVar.get() == False:
         str = str + '아무것도 선택되지 않았습니다. 다시 선택하세여'

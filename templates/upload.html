@@ -1,0 +1,13 @@
+<html>
+    <body>
+        <h1>file을 업로드하는 페이지입니다.</h1>
+        <p> POST 방식으로 업로드하며, enctype은 post방식으로 전달되는 객체가 어떤 형태로 encoding되어야 하는지를 의미합니다. </p>
+        <p> 또한 input에 type을 file이라고만 정의하면 알아서 잘 됩니다</p>
+        <p> 또한 file이 업로드되어, submit 버튼을 누르면, action 부분에 작성된 url로 넘어가게 됩니다. </p>
+        <form action="http://localhost:5000/file_uploaded" 
+        method="POST" enctype="multipart/form-data">
+            <input type="file" name="file1" />
+            <input type="submit" />
+        </form>
+    </body>
+</html>

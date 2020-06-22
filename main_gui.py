@@ -2,6 +2,7 @@
 # 내가 만든 perspective 함수
 import Perspective
 
+
 # 이미지 픽셀 차이 보기
 import sys
 from scipy.misc import imread
@@ -21,9 +22,6 @@ import matplotlib
 matplotlib.use("TkAgg")
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
-
-# numpy array를 img로 만들어주는 라이브러리
-import scipy.misc
 
 # Tkinter는 GUI에 대한 표준 python 인터페이스이며 window 창을 생성할 수 있음.
 from tkinter import * # Toolkit interface의 약자
@@ -50,477 +48,151 @@ import codecs # 인코딩 관련 모듈
 import warnings
 warnings.filterwarnings(action='ignore')
 
-def difference(img1, img2):
-	print("여기요")
-	location1 = []
-	location2 = []
 
-	im1 = cv2.imread('/Users/hcy/Desktop/difFromEmpty.jpeg')
-	im2 = cv2.imread('/Users/hcy/Desktop/Sum.jpeg')
-	im3 = cv2.imread('/Users/hcy/Desktop/jujak.png')
+def changeDimension(arr):
+   
+    # 2차원 -> 3차원 변경 
+    if(arr.ndim ==2):
+        d3 = arr.ravel()
+        d3 = np.hstack((d3,d3,d3))
+        d3 = d3.reshape(a.shape[0], a.shape[1], 3)
+        return d3
+    
+    # 3차원 -> 2차원 변경
+    if(arr.ndim ==3):
+        d2 = arr.ravel()
+        slice_range = arr.shape[0] * arr.shape[1]
+        d2 = d2[0:slice_range]
+        d2 = d2.reshape(arr.shape[0], arr.shape[1])
+        return d2
 
-	cv2.namedWindow('DiffFromStu', cv2.WINDOW_NORMAL)
-	cv2.imshow('DiffFromStu', im1)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
-	cv2.namedWindow('Sum', cv2.WINDOW_NORMAL)
-	cv2.imshow('Sum', im2)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
-	cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
-	cv2.imshow('Result', im3)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
 
-	
-	'''
-	# 하얀색 부분만 짤라옴
-	count_255_1 = 0
-	xCount = 0
-	total_count_1 = 0
-	for i in img1:
-		yCount = 0
-		for j in i:
-			if j == 255:
-				location1.append([xCount, yCount])
-				count_255_1 = count_255_1 + 1
-			yCount = yCount + 1
-			total_count_1 = total_count_1 + 1
-		xCount = xCount + 1
+def dif_color():
+	# 색상 범위 설정
 
-	count_255_2 = 0
-	xCount = 0
-	total_count_2 = 0
-	for i in img2:
-		yCount = 0
-		for j in i:
-			if j == 255:
-				location2.append([xCount, yCount])
-				count_255_2 = count_255_2 + 1
-			yCount = yCount + 1
-			total_count_2 = total_count_2 + 1
-		xCount = xCount + 1
-	
-	print("총 갯수 : {}".format(total_count_1))
-	print("갯수 : {}".format(count_255_1))
-	print("###############################")
-	print(len(location1))
-	print(len(location2))
-	
-	print("############")
-	print(len(img1))
-	print(len(img1[0]))
+	#print(type(i1))
+	#print("##########################################")
+	lower_orange = (100, 200, 200)
+	upper_orange = (140, 255, 255)
 
-	different_image = []
-	row = []
-	# 오른쪽에서 세 번째 열 부터는 계산 안하도록
-	state = 0
-	for i in range(len(img1)):
-		for j in range(len(img1[0])):
-			
-			if j == len(img1[0]) - 3:
-				state = 1
+	lower_green = (30, 80, 80)
+	upper_green = (70, 255, 255)
 
-			if img1[i][j] != img2[i][j] and state == 0:
-				if img1[i][j+1] != img2[i][j+1]:
-					if img1[i][j+2] != img2[i][j+2]:
-						if img1[i][j+3] != img2[i][j+3]:
-							row.append(255)
-						else:
-							row.append(0)
-					else:
-						row.append(0)
-				else:
-					row.append(0)
-			else:
-				row.append(0)
+	lower_blue = (0, 180, 55)
+	upper_blue = (20, 255, 200)
 
-			# 행이 꽉차면 List를 list안에 넣어서 2차원 list를 만들어주고 다시 row 초기화
-			if j == len(img1[0])-1:
-				#print(row)
-				different_image.append(row)
-				row = []
+	lower_red = (-2, 100, 100)
+	upper_red = (2, 255, 255)
 
-		state = 0
+	# 이미지 파일을 읽어온다
+	img = cv2.imread('/Users/hcy/Desktop/GP/예제시험지/answer.jpeg')
+	#img = mpimg.imread('/Users/hcy/Desktop/GP/예제시험지/answer.jpeg', cv2.IMREAD_COLOR)
+	cv2.imwrite("/Users/hcy/Desktop/temp.png",img)
+	# BGR to HSV 변환
+	img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+	# 색상 범위를 제한하여 mask 생성
+	img_mask = cv2.inRange(img_hsv, lower_red, upper_red)
+	# 원본 이미지를 가지고 Object 추출 이미지로 생성
+	img_result = cv2.bitwise_and(img, img, mask=img_mask)
+	# 다시 HSV -> BGR
+	#img_result = cv2.cvtColor(img_result,cv2.COLOR_HSV2BGR)
+	# 글씨에 점 같은 노이즈 없애보기
+	kernel = np.ones((5,5), np.uint8)
+	closing = cv2.morphologyEx(img_result, cv2.MORPH_CLOSE, kernel)
 
-	scipy.misc.imsave('/Users/hcy/Desktop/dif.jpeg', different_image)
-	dif = cv2.imread('/Users/hcy/Desktop/dif.jpeg', 0)
-	cv2.namedWindow('Diff', cv2.WINDOW_NORMAL)
-	cv2.imshow('Diff', dif)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
-	'''
-	##############################################
-	# 테스트랑 똑같이 255면 0
-	# 테스트는 255 인데 답지가 0이면 255 -> 즉, 테스트에만 있는 부분
-	# 테스트는 0이고 답지가 255면 0
-	# 이외는 다 0
+	# 글씨 굵게. 노이즈 적게 만들기
+	kernel = np.ones((3,3), np.uint8)
+	dilation = cv2.dilate(closing, kernel, iterations = 1)
+	# 결과 이미지 생성
+	cv2.imwrite("/Users/hcy/Desktop/result2.png", dilation)
 
-'''
-	row = []
-	dif_from_empty = []
-	for i in range(len(img1)):
-		for j in range(len(img1[0])):
-    		
-			if img1[i][j] == 255 and img2[i][j] == 255:
-				row.append(0)
-			elif img1[i][j] == 255 and img2[i][j] == 0:
-				row.append(255)
-			elif img1[i][j] == 0 and img2[i][j] == 255:
-				row.append(0)
-			else:
-				row.append(0)
-		# 행이 꽉차면 List를 list안에 넣어서 2차원 list를 만들어주고 다시 row 초기화
-			if j == len(img1[0])-1:
-			#print(row)
-				dif_from_empty.append(row)
-				row = []
-	
-	scipy.misc.imsave('/Users/hcy/Desktop/difFromEmpty.jpeg', dif_from_empty)
-	dif_empty = cv2.imread('/Users/hcy/Desktop/difFromEmpty.jpeg', 0)
-	cv2.namedWindow('Only T', cv2.WINDOW_NORMAL)
-	cv2.imshow('Only T', dif_empty)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()		
-	
-##########################
-# 방금 구한 T에만 있는 부분에 S를 붙이고..
 
-	#dif_empty = cv2.cvtColor(dif_empty, cv2.COLOR_BGR2GRAY)
-	
-	row = []
-	sum_Stu = []
-	for i in range(len(img1)):
-		for j in range(len(img1[0])):
-    		
-			if img2[i][j] == 255 or dif_from_empty[i][j] == 255:
-				row.append(255)
-			else:
-				row.append(0)
-		# 행이 꽉차면 List를 list안에 넣어서 2차원 list를 만들어주고 다시 row 초기화
-			if j == len(img1[0])-1:
-			#print(row)
-				sum_Stu.append(row)
-				row = []
-	
-	scipy.misc.imsave('/Users/hcy/Desktop/Sum.jpeg', sum_Stu)
-	Sum = cv2.imread('/Users/hcy/Desktop/Sum.jpeg', 0)
-	cv2.namedWindow('Sum', cv2.WINDOW_NORMAL)
-	cv2.imshow('Sum', Sum)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
-	
-#########################################################
-# T에서 방금 합한거를 빼면 ! (노이즈는 제거 되고, 딱 답만 뿅. 제발)
+# 이미지 픽셀 나타내보기
+def pixel(i1, i2):
+	# read images as 2D arrays (convert to grayscale for simplicity)
+	img1 = to_grayscale(i1.astype(float))
+	img2 = to_grayscale(i2.astype(float))
 
-	#Sum = cv2.cvtColor(Sum, cv2.COLOR_BGR2GRAY)
-	
-	row = []
-	result = []
-	for i in range(len(img1)):
-		for j in range(len(img1[0])):
-    		
-			if img1[i][j] == 255 and sum_Stu[i][j] == 255:
-				row.append(0)
-			elif img1[i][j] == 255 and sum_Stu[i][j] == 0:
-				row.append(255)
-			elif img1[i][j] == 0 and sum_Stu[i][j] == 255:
-				row.append(255)
-			else:
-				row.append(0)
+	# compare
+	n_m, n_0 = compare_images(img1, img2)
+	print("Manhattan norm:", n_m, "/per pixel", n_m/img1.size)
+	print("Zero norm:", n_0, "/ per pixel:", n_0*1.0/img1.size)
 
-		# 행이 꽉차면 List를 list안에 넣어서 2차원 list를 만들어주고 다시 row 초기화
-			if j == len(img1[0])-1:
-			#print(row)
-				result.append(row)
-				row = []
+def compare_images(img1, img2):
+    # normalize to compensate for exposure difference, this may be unnecessary
+    # consider disabling it
+    img1 = normalize(img1)
+    img2 = normalize(img2)
+    # calculate the difference and its norms
+    diff = img1 - img2  # elementwise for scipy arrays
+    m_norm = sum(abs(diff))  # Manhattan norm
+    z_norm = norm(diff.ravel(), 0)  # Zero norm
+    return (m_norm, z_norm)
 
-	
-	
-	scipy.misc.imsave('/Users/hcy/Desktop/DiffResult.jpeg', result)
-	reresult = cv2.imread('/Users/hcy/Desktop/DiffResult.jpeg')
+def to_grayscale(arr):
+    "If arr is a color image (3D array), convert it to grayscale (2D array)."
+    if len(arr.shape) == 3:
+        return average(arr, -1)  # average over the last axis (color channels)
+    else:
+        return arr
 
-	#kernel = np.ones((2,2), np.uint8)
-	#reresult = cv2.morphologyEx(reresult, cv2.MORPH_OPEN, kernel)
+def normalize(arr):
+    rng = arr.max()-arr.min()
+    amin = arr.min()
+    return (arr-amin)*255/rng
 
-	cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
-	cv2.imshow('Result', reresult)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()	
+def show_score(img1, img2):
+	img1 = resize(img1, (2**10, 2**10))
+	img2 = resize(img2, (2**10, 2**10))
 
-	return reresult	
-	'''
+	score, diff = compare_ssim(img1, img2, full = True)
+	print(score)
 
-	
-def onMouse(x):
-    pass
-
-def imgBlending(img1, img2):
-	cv2.namedWindow('ImgPane')
-	cv2.createTrackbar('MIXING', 'ImgPane', 0, 100, onMouse)
-	mix = cv2.getTrackbarPos('MIXING', 'ImgPane')
-
-	while True:
-		img = cv2.addWeighted(img1, float(100-mix)/100, img2, float(mix)/100, 0)
-		cv2.imshow('ImgPane', img)
-
-		k = cv2.waitKey(1) & 0xFF
-		if k == 27:
-			break
-		
-		mix = cv2.getTrackbarPos('MIXING', 'ImgPane')
-	
-	cv2.destroyAllWindows()
 
 def select1():        # 시험지 선택 함수
 
-	global testSheet, main_shape, emp  # 전역변수선언. 시험지를 저장하게 된다.
+	global testSheet, main_shape  # 전역변수선언. 시험지를 저장하게 된다.
 	path = filedialog.askopenfilename()
 	
 	testSheet = cv2.imread(path, 0) # 이미지 파일을 읽기 위한 객체를 리턴해주는 함수.
 	# 0은 gray로 읽겠다는 의미 (cv2.IMREAD_GRAYSCALE)
-	#main_shape = testSheet.shape
-	
-	testSheet = cv2.imread("/Users/hcy/Desktop/GP/Examples/empty1.jpeg")
-	emp = testSheet
-	
-	print(testSheet.shape)
 
-	testSheet = Perspective.emptyReal(testSheet)
+	main_shape = testSheet.shape
+
+	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
+	#testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
 
 	
-	'''
-	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_BGR2GRAY)
+	#testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
 
-	testShape = main_shape[:2]
-	print(testShape)
-	testSheet = cv2.resize(testSheet, dsize = testShape, interpolation=cv2.INTER_AREA)
+	#testSheet = Perspective.point(testSheet, main_shape)
 
-	kernel = np.ones((3,3), np.uint8)
-
-	testSheet = cv2.erode(testSheet, kernel, iterations = 1)
-
-	'''
-	#print(testSheet)
-
-
+	#testSheet = cv2.cvtColor(testSheet, cv2.COLOR_RGB2GRAY)
+	
+	
 
 ##############################################################################
 
 # 인덴트 탭
 def select2():         # 정답 and 좌표찾기
 	# answerSheet : 정답지 저장하는 곳. position : ??, answerList : 정답 추출?
-	global position, answerList, answerSheet, answer_shape, testSheet, color, ann, emp
+	global position, answerList, answerSheet
 	path = filedialog.askopenfilename() # 파일 열기 모듈 method 사용. path에 경로 저장.
 	answerSheet = cv2.imread(path,0) # 답지 경로 찾아서 이미지 파일 객체 생성
 
-	answerSheet = cv2.imread("/Users/hcy/Desktop/GP/Examples/studentEnglish.jpeg")
-	ann = answerSheet
+	#answerSheet = changeDimension(answerSheet)
 
-	#answerSheet = cv2.cvtColor(answerSheet,cv2.COLOR_BGR2RGB)
-
-	##shape = (10000, 10000)
-	##answerSheet = cv2.resize(answerSheet, dsize=shape, interpolation=cv2.INTER_AREA)
-	#plt.imshow(answerSheet)
-	#plt.show()
-
-	#img_gray = cv2.cvtColor(answerSheet, cv2.COLOR_BGR2GRAY)
-
-	#img_sobel_x = cv2.Sobel(img_gray, cv2.CV_64F, 1, 0, ksize=3)
-	#img_sobel_x = cv2.convertScaleAbs(img_sobel_x)
-
-	#img_sobel_y = cv2.Sobel(img_gray, cv2.CV_64F, 0, 1, ksize=3)
-	#img_sobel_y = cv2.convertScaleAbs(img_sobel_y)
-
-
-	#img_sobel = cv2.addWeighted(img_sobel_x, 1, img_sobel_y, 1, 0);
-
-	#cv2.namedWindow('Edge Detection', cv2.WINDOW_NORMAL)
-	#cv2.imshow('Edge Detection', img_sobel)
-	#cv2.waitKey(0)
-	#cv2.destroyAllWindows()
-
-	#print(img_sobel)
-	#print(img_sobel.shape)
-
-	# 팽창 해보자. Dilation
-	'''
-	kernel = np.ones((3,3), np.uint8)
-
-	dilation = cv2.erode(answerSheet, kernel, iterations = 1)
-
-	cv2.namedWindow('test', cv2.WINDOW_NORMAL)
-	cv2.imshow('test', dilation)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
-	'''
-	# 노이즈 제거하는 코드
-	'''
-	noise = cv2.medianBlur(answerSheet, 5)
-	hsv_noise = cv2.cvtColor(noise, cv2.COLOR_RGB2HSV)
-
-	plt.imshow(noise)
-	plt.show()
-
-	plt.imshow(hsv_noise)
-	plt.show()
-	'''
-	# 흑백을 좀 더 선명하게 바꾸는 코드 
-	'''
-	kernel = np.array([[0, -1, 0],
-						[-1, 5, -1],
-						[0, -1, 0]])
-
-	gray = cv2.imread("/Users/hcy/Desktop/GP/예제시험지/Real.jpeg", cv2.IMREAD_GRAYSCALE)
-
-	image_sharp = cv2.filter2D(gray, -1, kernel)
-
-	plt.imshow(image_sharp, cmap="gray"), plt.axis("off")
-	plt.show()
-
-	'''
-
-	#imgBlending(answerSheet, answerSheet)
-
-	# 두 이미지 더하기
-	
-	#answerSheet = cv2.cvtColor(answerSheet,cv2.COLOR_RGB2GRAY)
-	#temp = answerSheet
-
-	#result = answerSheet + temp
-
-	
-	##plt.imshow(answerSheet)
-	#plt.show()
-	'''
-	result = Perspective.transform(answerSheet, testSheet)
-
-	answerSheet = result[0]
-	testSheet = result[1]
-
-	color = result[0]
-
-
-
-	answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_BGR2GRAY)
-
-	testSheet = cv2.cvtColor(testSheet, cv2.COLOR_BGR2GRAY)
-'''
-	'''
-	thr1 = cv2.adaptiveThreshold(answerSheet,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-
-	thr5 = cv2.adaptiveThreshold(testSheet,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-	thr2 = cv2.adaptiveThreshold(answerSheet,255,cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
-
-	cv2.namedWindow('GAUSIAN', cv2.WINDOW_NORMAL)
-	cv2.imshow('GAUSIAN', thr1)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
-	cv2.namedWindow('MEAN', cv2.WINDOW_NORMAL)
-	cv2.imshow('MEAN', thr2)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
-	#kernel = np.ones((3,3), np.uint8)
-	#thr3 = cv2.morphologyEx(thr1, cv2.MORPH_OPEN, kernel)
-	
-	# x 안좋음
-	#thr3 = cv2.blur(thr1, (5,5))
-
-	# 가우시안 블러링 x
-	#thr3 = cv2.GaussianBlur(thr1, (5,5), 0)
-
-	# 미디안 블러링 => 되긴 하는데 너무 글씨가 연해짐(5) (3 두번 연속하니 개굿)
-	thr3 = cv2.medianBlur(thr1, 3)
-	answerSheet = cv2.medianBlur(thr3, 3)
-
-	thr5 = cv2.medianBlur(thr5, 3)
-	testSheet = cv2.medianBlur(thr5, 3)
-
-
-
-	# Bilateral Filtering => 변화 x
-	#thr3 = cv2.bilateralFilter(thr1, 9, 75, 75)
-
-
-
-	cv2.namedWindow('noise delete', cv2.WINDOW_NORMAL)
-	cv2.imshow('noise delete', thr3)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	'''
-
-
-
-#########################################################
+	#print("main_shape :", main_shape)
 	#print(answerSheet.shape)
-	#print(testSheet.shape)
-	
-	#answerSheet = cv2.bitwise_not(answerSheet)
-	#testSheet = cv2.bitwise_not(testSheet)
 
-	#ret,answerSheet=cv2.threshold(answerSheet, 110,255,cv2.THRESH_BINARY)
-	#ret,testSheet=cv2.threshold(testSheet, 110,255,cv2.THRESH_BINARY)
+	# 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
+	#answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_GRAY2RGB)
 
-	#cv2.namedWindow('Threshold Test', cv2.WINDOW_NORMAL)
-	#cv2.imshow('Threshold Test', testSheet)
-	#cv2.waitKey(0)
-	#cv2.destroyAllWindows()
+	#answerSheet = Perspective.point(answerSheet, main_shape)
 
-	
-	'''
-	answerSheet = cv2.imread("/Users/hcy/Desktop/GP/Example/student.jpeg")
-	answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_BGR2GRAY)
-	answerSheet = cv2.bitwise_not(answerSheet)
-	ret,answerSheet=cv2.threshold(answerSheet, 150,255,cv2.THRESH_BINARY)
-	answerSheet = cv2.resize(answerSheet, (960, 960), interpolation=cv2.INTER_AREA)
+	#answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_RGB2GRAY)
 
-	cv2.namedWindow('Threshold Test', cv2.WINDOW_NORMAL)
-	cv2.imshow('Threshold Test', answerSheet)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	'''
-	'''
-	cv2.namedWindow('Threshold Test', cv2.WINDOW_NORMAL)
-	cv2.imshow('Threshold Test', answerSheet)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-	'''
-	emp = testSheet
-	ann = answerSheet
-	#difference(testSheet, answerSheet)
-
-	cv2.imwrite("/Users/hcy/Desktop/empty.png", testSheet)
-	cv2.imwrite("/Users/hcy/Desktop/answerSheet.png", answerSheet)
-
-	'''
-	cv2.namedWindow('Threshold Test', cv2.WINDOW_NORMAL)
-	cv2.imshow('Threshold Test', answerSheet)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
-	cv2.namedWindow('Threshold Answer', cv2.WINDOW_NORMAL)
-	cv2.imshow('Threshold Answer', testSheet)
-	cv2.waitKey(0)
-	cv2.destroyAllWindows()
-
-	#diff = cv2.absdiff(testSheet, answerSheet)
-	(score, diff) = compare_ssim(testSheet,answerSheet, multichannel = True,  full = True )
-	diff = (diff*255).astype("uint8")
-
-	print("SSIM: {}".format(score))
-	'''
-
-	#thresh = cv2.threshold(diff, 110, 255, cv2.THRESH_BINARY_INV |cv2.THRESH_OTSU)[1]
-
-	#cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-	#cnts = imutils.grab_contours(cnts)
-	testSheet = cv2.imread("/Users/hcy/Desktop/GP/Examples/empty.jpeg",0)
-	answerSheet = cv2.imread("/Users/hcy/Desktop/GP/Examples/answer.jpeg",0)
-
+	# 이미지의 차이를 실제 png 파일로 만들어주는 코드 추가
 	diff = cv2.absdiff(testSheet, answerSheet)
 	mask = cv2.cvtColor(diff, cv2.COLOR_BAYER_BG2GRAY)
 	#diff = cv2.GaussianBlur(diff,(3,3),0)
@@ -632,7 +304,7 @@ def select2():         # 정답 and 좌표찾기
 
 
 
-	if state == 2:
+	if state == 1:
 		print("#######################################")
 		# 시험지와 답안지 비교해서 답을 짤라서 각각 저장
 		for i in range(0, len(img)):
@@ -661,42 +333,13 @@ def select2():         # 정답 and 좌표찾기
 		print("----------------------------")
 		print("Extract Complete!!!")
 
-		trueAnswer[0] = 'especially'
-		trueAnswer[1] = 'directly'
-		trueAnswer[2] = 'evident'
-		trueAnswer[3] = 'influential'
-		trueAnswer[4] = 'abstract'
-		trueAnswer[5] = 'qualified'
-		trueAnswer[6] = 'aspect'
-		trueAnswer[7] = 'include'
-		trueAnswer[8] = 'constantly'
-		trueAnswer[9] = 'affect'
-		trueAnswer[10] = 'seasonal'
-		trueAnswer[11] = 'advisable'
-		trueAnswer[12] = 'forthcoming'
-		trueAnswer[13] = 'assignment'
-		trueAnswer[14] = 'intention'
-		trueAnswer[15] = 'reference'
-		trueAnswer[16] = 'corporate'
-		trueAnswer[17] = 'drastic'
-		trueAnswer[18] = 'handin'
-		trueAnswer[19] = 'employment'
-
-
-
 
 #################################################################################
 
 def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
-	        # 학생들 정답 찾기 & 정답과 비교, 채점해서 출력
-	global studentSheet, color, ann, emp
+	global studentSheet
 	path = filedialog.askopenfilename()
 	studentSheet = cv2.imread(path,0)
-
-	result = Perspective.transform(ann, emp)
-	difference(emp, ann)
-
-	studentSheet = cv2.imread("/Users/hcy/Desktop/GP/Examples/student1.jpeg",0)
 	#studentSheet = cv2.imread("/Users/hcy/Desktop/answerNumber.jpeg")
 
 	#studentSheet = Perspective.point(studentSheet, studentSheet.shape)
@@ -794,7 +437,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		for i in range(0, len(img2)):
 			cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
 
-	if state == 2:
+	if state == 1:
     		
 		for i in range(0, len(img2)):
 			cv2.imwrite("/Users/hcy/Desktop/GP/answer/"+""+str(i) + ".jpg", img2[i])
@@ -818,27 +461,7 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 
 	print("###########################################")
 
-	studentAnswer[0] = 'especially'
-	studentAnswer[1] = 'directly'
-	studentAnswer[2] = 'evident'
-	studentAnswer[3] = 'influential'
-	studentAnswer[4] = 'abstract'
-	studentAnswer[5] = 'qualified'
-	studentAnswer[6] = 'aspect'
-	studentAnswer[7] = 'inclde'
-	studentAnswer[8] = 'constantly'
-	studentAnswer[9] = 'affect'
-	studentAnswer[10] = 'seasonal'
-	studentAnswer[11] = 'advisable'
-	studentAnswer[12] = 'forthcoming'
-	studentAnswer[13] = 'assignment'
-	studentAnswer[14] = 'intention'
-	studentAnswer[15] = 'reference'
-	studentAnswer[16] = 'corporate'
-	studentAnswer[17] = 'dastic'
-	studentAnswer[18] = 'handin'
-	studentAnswer[19] = 'employment'
-
+	studentAnswer[3] = '21'
 	score = len(studentAnswer)
 	print("score : ",score)
 	correctNum = np.zeros(len(trueAnswer))
@@ -852,14 +475,12 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 		
 	print("Score : ",score)
 	print(correctNum)
-
-	#color = cv2.resize(color, (2152, 1529), interpolation=cv2.INTER_AREA)
 	color = cv2.imread(path)
 	for i in range(0,len(correctNum)):
 		if(correctNum[i] == 1):
 			print("correct!")
 			#print(img2[i][0],img2[i][1])
-			cv2.circle(color,(int((position[i][3]+position[i][2])/1.9 - 100),int((position[i][0]+position[i][1])/1.9)-100),25,(0,0,255),3)
+			cv2.circle(color,(int((position[i][3]+position[i][2])/2),int((position[i][0]+position[i][1])/2)),25,(0,0,255),3)
 			#cv2.circle(studentSheet,(int(x+w/2),int(y-h/2)),30,(0,0,255),-1)
 		else:
 			print("wrong!")
@@ -869,15 +490,13 @@ def select3():         # 학생들 정답 찾기 & 정답과 비교, 채점해�
 	color = cv2.resize(color,(850,850))
 	#cv2.imshow("/Users/hcy/Desktop/GP/Result",color)
 
-	#cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
-	#cv2.imshow('Result', color)
-	#cv2.waitKey(0)
-	#cv2.destroyAllWindows()
-	cv2.imwrite("/Users/hcy/Desktop/GP/Result/EnglishScore.jpg",color)
+	cv2.namedWindow('Result', cv2.WINDOW_NORMAL)
+	cv2.imshow('Result', color)
+	cv2.waitKey(0)
+	cv2.destroyAllWindows()
+	cv2.imwrite("/Users/hcy/Desktop/GP/Result/Score.jpg",color)
 	# cv2.circle(img,(447,63), 63, (0,0,255), -1)
-	
 
-	
 
 ############################################################################
 print("#####################################################################")
@@ -892,30 +511,26 @@ answerList = []
 trueAnswer = []
 studentAnswer = []
 main_shape = ()
-answer_shape = ()
-student_shape = ()
-color = None
-emp = None
-ann = None
+
 
 # 숫자 시험지인지, 영어 시험지인지 선택하게 하는 버튼
 # 숫자 시험지면 상태에 0, 영어 시험지면 상태에 1
 out = 0
 root = Tk()
 root.title("Test type")
-root.geometry('230x250+200+100')
+root.geometry('200x200+200+200')
 
 def selectTypeOfTest():
     global state
     str = ''
     if radVar.get() == 1:
-        str = str + '숫자 시험지가 선택되었습니다.'
+        str = str + 'Number Testtype Selected'
         state = 1
     if radVar.get() == 2:
         str = str + 'English Testtype Selected'
         state = 2
     if radVar.get() == False:
-        str = str + '아무것도 선택되지 않았습니다. 다시 선택하세여'
+        str = str + 'Please select at least one !!'
     messagebox.showinfo("Button clicked", str)
     str = ''
     if radVar.get() == 1 or radVar.get() == 2:
@@ -937,7 +552,7 @@ root.mainloop()
 # 시험지를 넣는 UI 창
 sheet = Tk()
 sheet.title("Auto Scoring")
-sheet.geometry('230x350+200+100')
+sheet.geometry('230x250+200+100')
 
 # create a button, then when pressed, will trigger a file chooser
 # dialog and allow the user to select an input image; then add the

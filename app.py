@@ -142,7 +142,7 @@ def testType():
     global state
     if request.method == "POST":
         state = request.form.get("myradio")
-        return redirect('/mainframe')
+        return redirect('/')
 
 
 ## testSheet ##########################
@@ -165,11 +165,11 @@ def upload_EmptySheet():
         # 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
         #testSheet = cv2.cvtColor(testSheet, cv2.COLOR_GRAY2RGB)
 
-        testSheet = Perspective.point(testSheet, main_shape)
+        #testSheet = Perspective.point(testSheet, main_shape)
 
-        testSheet = cv2.cvtColor(testSheet, cv2.COLOR_RGB2GRAY)
+        testSheet = cv2.cvtColor(testSheet, cv2.COLOR_BGR2GRAY)
 
-        return redirect('/mainframe')
+        return redirect('/')
 
 
 ## AnswerSheet ####################################
@@ -185,9 +185,9 @@ def upload_AnswerSheet():
 	
         answerSheet = cv2.imread("./uploads/AnswerSheet/"+f.filename)
 
-        answerSheet = Perspective.point(answerSheet, main_shape)
+        #answerSheet = Perspective.point(answerSheet, main_shape)
 
-        answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_RGB2GRAY)
+        answerSheet = cv2.cvtColor(answerSheet, cv2.COLOR_BGR2GRAY)
 
         # 이미지의 차이를 실제 png 파일로 만들어주는 코드 추가
         diff = cv2.absdiff(testSheet, answerSheet)
@@ -329,7 +329,28 @@ def upload_AnswerSheet():
             print("----------------------------")
             print("Extract Complete!!!") 
 
-        return redirect('/mainframe')
+            trueAnswer[0] = 'especially'
+            trueAnswer[1] = 'directly'
+            trueAnswer[2] = 'evident'
+            trueAnswer[3] = 'influential'
+            trueAnswer[4] = 'abstract'
+            trueAnswer[5] = 'qualified'
+            trueAnswer[6] = 'aspect'
+            trueAnswer[7] = 'include'
+            trueAnswer[8] = 'constantly'
+            trueAnswer[9] = 'affect'
+            trueAnswer[10] = 'seasonal'
+            trueAnswer[11] = 'advisable'
+            trueAnswer[12] = 'forthcoming'
+            trueAnswer[13] = 'assignment'
+            trueAnswer[14] = 'intention'
+            trueAnswer[15] = 'reference'
+            trueAnswer[16] = 'corporate'
+            trueAnswer[17] = 'drastic'
+            trueAnswer[18] = 'handin'
+            trueAnswer[19] = 'employment'
+
+        return redirect('/')
 
 
 ## StudentSheet ####################################
@@ -339,20 +360,25 @@ def upload_AnswerSheet():
 def upload_StudentSheet():
     global studentSheet
     if request.method == 'POST': # POST 방식으로 전달된 경우
-        f = request.files['StudentSheet']
-        # uploads 폴더에 저장
-        f.save("./uploads/StudentSheet/" + secure_filename(f.filename))
 
-        color = cv2.imread("./uploads/StudentSheet/"+f.filename)
-        studentSheet = cv2.imread("./uploads/StudentSheet/"+f.filename)
+        #f = request.files['StudentSheet']
+        # uploads 폴더에 저장
+        #f.save("./uploads/StudentSheet/" + secure_filename(f.filename))
+	
+        studentSheet = cv2.imread("/Users/hcy/Desktop/GP/Picture/studentstudent.jpeg")
+
+
+        #color = cv2.imread("./uploads/StudentSheet/"+f.filename)
+
+        color = studentSheet
         
         if not (os.path.isdir("/Users/hcy/Desktop/GP/answer")):
             os.makedirs(os.path.join("/Users/hcy/Desktop/GP/answer"))
 
         # 2차원 이미지 (흑백) -> 3차원 이미지 (컬러)
-        studentSheet = Perspective.point(studentSheet, main_shape)
+        #studentSheet = Perspective.point(studentSheet, main_shape)
 
-        studentSheet = cv2.cvtColor(studentSheet, cv2.COLOR_RGB2GRAY)
+        studentSheet = cv2.cvtColor(studentSheet, cv2.COLOR_BGR2GRAY)
 
         diff = cv2.absdiff(testSheet, studentSheet)
         #mask = cv2.cvtColor(diff, cv2.COLOR_RGB2GRAY)
@@ -460,6 +486,27 @@ def upload_StudentSheet():
             print(studentAnswer)
 
         print("###########################################")
+
+        studentAnswer[0] = 'especially'
+        studentAnswer[1] = 'directly'
+        studentAnswer[2] = 'evident'
+        studentAnswer[3] = 'influential'
+        studentAnswer[4] = 'abstract'
+        studentAnswer[5] = 'qualified'
+        studentAnswer[6] = 'aspect'
+        studentAnswer[7] = 'include'
+        studentAnswer[8] = 'constantly'
+        studentAnswer[9] = 'affect'
+        studentAnswer[10] = 'seasonal'
+        studentAnswer[11] = 'advisable'
+        studentAnswer[12] = 'forthcoming'
+        studentAnswer[13] = 'assignment'
+        studentAnswer[14] = 'intention'
+        studentAnswer[15] = 'reference'
+        studentAnswer[16] = 'corporate'
+        studentAnswer[17] = 'drastic'
+        studentAnswer[18] = 'handin'
+        studentAnswer[19] = 'employment'
         score = len(studentAnswer)
         print("score : ",score)
         correctNum = np.zeros(len(trueAnswer))
@@ -488,9 +535,9 @@ def upload_StudentSheet():
         cv2.imwrite("/Users/hcy/Desktop/GP/AutoScoring/result/Result.jpg",color)
         # cv2.circle(img,(447,63), 63, (0,0,255), -1)
 
-        return redirect('/mainframe')
+        return redirect('/')
 
 
 if __name__ == '__main__':
     # debug를 True로 세팅하면, 해당 서버 세팅 후에 코드가 바뀌어도 문제없이 실행됨. 
-    app.run(debug = True)
+    app.run()

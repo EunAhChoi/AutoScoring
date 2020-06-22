@@ -26,15 +26,11 @@
     <div>
       <h4 class="mb-3">TestSheetType</h4>
 
-      <div class="d-block my-3">
-        <div class="custom-control custom-radio">
-          <input id="credit" name="paymentMethod" type="radio" class="custom-control-input" checked required>
-          <label class="custom-control-label" for="credit">Number</label>
-        </div>
-      <div class="custom-control custom-radio">
-        <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" required>
-        <label class="custom-control-label" for="debit">English</label>
-      </div>
+      <form method="POST" action="/test_type">
+        Number  <input type="radio" value = "1" name="myradio"></input>
+        English  <input type="radio" value = "2" name="myradio"></input>
+        <input type="submit"></input>
+      </form>
     </div>
 
     <div>
@@ -48,21 +44,22 @@
 
     <div>
       <h4 class="mb-3">AnswerSheet</h4>
-      <form action="http://localhost:5000/file_uploaded" 
+      <form action="http://localhost:5000/AnswerSheet_uploaded" 
         method="POST" enctype="multipart/form-data">
-        <input type="file" name="file1"></input>
+        <input type="file" name="AnswerSheet"></input>
         <input type="submit"></input>
       </form>
     </div>
 
     <div>
       <h4 class="mb-3">StudentSheet</h4>
-      <form action="http://localhost:5000/file_uploaded" 
+      <form action="http://localhost:5000/StudentSheet_uploaded" 
         method="POST" enctype="multipart/form-data">
-        <input type="file" name="file1"></input>
+        <input type="file" name="StudentSheet"></input>
         <input type="submit"></input>
       </form>
     </div>
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
