@@ -20,4 +20,4 @@ https://github.com/githubharald/SimpleHTR
 
 <br><br>
 
-> <h2>Go to Wiki <a href ="./wiki/HowToUse#-including-in-your-project"> How to use API </a></h2>
+> <h2>Go to Wiki <a href ="./wiki/HowToUse"> How to use API </a></h2>
