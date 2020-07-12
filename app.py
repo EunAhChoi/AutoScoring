@@ -233,28 +233,7 @@ def upload_AnswerSheet():
             for i in range(len(trueAnswer)):
                 print(trueAnswer[i])
             print("----------------------------")
-            print("Extract Complete!!!") 
-
-            trueAnswer[0] = 'especially'
-            trueAnswer[1] = 'directly'
-            trueAnswer[2] = 'evident'
-            trueAnswer[3] = 'influential'
-            trueAnswer[4] = 'abstract'
-            trueAnswer[5] = 'qualified'
-            trueAnswer[6] = 'aspect'
-            trueAnswer[7] = 'include'
-            trueAnswer[8] = 'constantly'
-            trueAnswer[9] = 'affect'
-            trueAnswer[10] = 'seasonal'
-            trueAnswer[11] = 'advisable'
-            trueAnswer[12] = 'forthcoming'
-            trueAnswer[13] = 'assignment'
-            trueAnswer[14] = 'intention'
-            trueAnswer[15] = 'reference'
-            trueAnswer[16] = 'corporate'
-            trueAnswer[17] = 'drastic'
-            trueAnswer[18] = 'handin'
-            trueAnswer[19] = 'employment'
+            print("Extract Complete!!!")
 
         return redirect('/')
 
@@ -392,26 +371,6 @@ def upload_StudentSheet():
 
         print("###########################################")
 
-        studentAnswer[0] = 'especially'
-        studentAnswer[1] = 'directly'
-        studentAnswer[2] = 'evident'
-        studentAnswer[3] = 'influential'
-        studentAnswer[4] = 'abstract'
-        studentAnswer[5] = 'qualified'
-        studentAnswer[6] = 'aspect'
-        studentAnswer[7] = 'include'
-        studentAnswer[8] = 'constantly'
-        studentAnswer[9] = 'affect'
-        studentAnswer[10] = 'seasonal'
-        studentAnswer[11] = 'advisable'
-        studentAnswer[12] = 'forthcoming'
-        studentAnswer[13] = 'assignment'
-        studentAnswer[14] = 'intention'
-        studentAnswer[15] = 'reference'
-        studentAnswer[16] = 'corporate'
-        studentAnswer[17] = 'drastic'
-        studentAnswer[18] = 'handin'
-        studentAnswer[19] = 'employment'
         score = len(studentAnswer)
         print("score : ",score)
         correctNum = np.zeros(len(trueAnswer))
